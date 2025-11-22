@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Entrainer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#172033',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.2s ease-out',
+                        'slide-up': 'slideUp 0.3s ease-out'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(10px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+        
+        /* --- THEME VARIABLES --- */
+        :root {
+            --bg-main: #f8fafc;
+            --bg-panel: rgba(255, 255, 255, 0.85);
+            --bg-input: #ffffff;
+            --text-main: #475569;
+            --text-high: #0f172a;
+            --border-color: rgba(203, 213, 225, 0.8);
+            --slider-track: #e2e8f0;
+            --scan-line: #0ea5e9;
+            --scan-shadow: rgba(14, 165, 233, 0.4);
+            
+            --cvs-bg: #f8fafc;
+            --cvs-grid: #e2e8f0;
+            --cvs-text: #94a3b8;
+            --cvs-axis: #cbd5e1;
+            
+            --btn-theme-bg: #ffffff;
+            --btn-theme-hover: #f1f5f9;
+            --btn-theme-text: #475569;
+
+            --btn-primary-bg: #0f172a;
+            --btn-primary-text: #f8fafc;
+        }
+
+        .dark-mode {
+            --bg-main: #020617;
+            --bg-panel: rgba(15, 23, 42, 0.7);
+            --bg-input: #0f172a;
+            --text-main: #94a3b8;
+            --text-high: #e2e8f0;
+            --border-color: rgba(51, 65, 85, 0.4);
+            --slider-track: #1e293b;
+            --scan-line: #22d3ee;
+            --scan-shadow: rgba(34,211,238,0.9);
+            
+            --cvs-bg: #020617;
+            --cvs-grid: #1e293b;
+            --cvs-text: #64748b;
+            --cvs-axis: #0f172a;
+            
+            --btn-theme-bg: #1e293b;
+            --btn-theme-hover: #334155;
+            --btn-theme-text: #e2e8f0;
+
+            --btn-primary-bg: #1e293b;
+            --btn-primary-text: #e2e8f0;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            overflow: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* --- UI ELEMENTS --- */
+        .glass-panel {
+            background: var(--bg-panel);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .dark-mode .glass-panel {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Range Sliders */
+        input[type=range] { -webkit-appearance: none; background: transparent; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 14px; width: 6px;
+            border-radius: 1px;
+            background: #0ea5e9; 
+            margin-top: -5px;
+            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+        .dark-mode input[type=range]::-webkit-slider-thumb {
+            background: #38bdf8;
+            border: 1px solid #0c4a6e;
+            box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px;
+            background: var(--slider-track);
+            border-radius: 2px;
+            transition: background 0.3s;
+        }
+        
+        .slider-pink::-webkit-slider-thumb { background: #ec4899; }
+        .slider-purple::-webkit-slider-thumb { background: #a855f7; }
+
+        /* Number Inputs */
+        input[type=number] {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            color: var(--text-high);
+            font-family: 'JetBrains Mono', monospace;
+            padding: 2px 4px; width: 50px;
+            text-align: center; font-size: 0.75rem;
+            transition: all 0.3s; border-radius: 4px;
+        }
+        input[type=number]:focus { outline: 2px solid #0ea5e9; border-color: transparent; }
+
+        /* Time Input */
+        input[type=time] {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            color: var(--text-high);
+            font-family: 'JetBrains Mono', monospace;
+            padding: 2px 6px;
+            font-size: 0.75rem;
+            border-radius: 4px;
+            outline: none;
+            cursor: pointer;
+        }
+        input[type=time]::-webkit-calendar-picker-indicator {
+            filter: invert(0.5);
+            cursor: pointer;
+        }
+
+        canvas { image-rendering: pixelated; transition: filter 0.3s; }
+        
+        .label-xs { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-main); opacity: 0.8; }
+        .txt-high { color: var(--text-high); }
+        .txt-main { color: var(--text-main); }
+        
+        /* Buttons */
+        .btn-icon {
+            background-color: var(--btn-theme-bg);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .btn-icon:hover { background-color: var(--btn-theme-hover); color: var(--text-high); }
+        .btn-icon.active { background-color: var(--slider-track); color: var(--scan-line); border-color: var(--scan-line); }
+        
+        .btn-primary {
+            background-color: var(--btn-primary-bg);
+            color: var(--btn-primary-text);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+        }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-primary:active { transform: translateY(0); }
+
+        #configContainer {
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+            max-height: 600px;
+            opacity: 1;
+            overflow: hidden;
+        }
+        #configContainer.collapsed {
+            max-height: 0;
+            opacity: 0;
+            margin-top: 0;
+        }
+
+        /* Modal */
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
+
+    <!-- VISUALIZATION LAYER -->
+    <div class="relative flex-1 w-full overflow-hidden border-b" style="border-color: var(--border-color); background-color: var(--cvs-bg);">
+        <canvas id="waterfall" class="absolute inset-0 w-full h-full"></canvas>
+        
+        <!-- Scan Line -->
+        <div id="scanLine" class="absolute left-0 w-full h-px hidden z-10" style="background-color: var(--scan-line); box-shadow: 0 0 10px var(--scan-shadow);"></div>
+
+        <!-- HUD Left -->
+        <div class="absolute top-4 left-4 pointer-events-none z-20">
+            <div class="label-xs">System Status</div>
+            <div id="stateDisplay" class="font-bold text-lg txt-main">READY</div>
+            <div id="timeDisplay" class="font-mono text-xs mt-1 txt-main">00:00 / --:--</div>
+        </div>
+
+        <!-- HUD Right (Live Data) -->
+        <div class="absolute top-4 right-4 text-right pointer-events-none z-20 flex flex-col items-end">
+            <div class="label-xs">Current Delta</div>
+            <div class="flex items-baseline gap-3">
+                <div id="rangeBadge" class="text-xs font-bold px-2 py-0.5 rounded border bg-slate-500/10 backdrop-blur" style="color: #a78bfa; border-color: #a78bfa;">--</div>
+                <div id="deltaDisplay" class="font-bold text-2xl drop-shadow-md txt-high">-- Hz</div>
+            </div>
+            <div class="flex gap-3 mt-1 text-[10px] font-mono justify-end txt-main">
+                <span>L: <span id="freqL" class="text-cyan-600 dark:text-cyan-400">--</span></span>
+                <span>R: <span id="freqR" class="text-fuchsia-600 dark:text-fuchsia-400">--</span></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTROL DECK -->
+    <div class="h-auto p-4 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] z-30 transition-all duration-500" style="background-color: var(--bg-main); border-top: 1px solid var(--border-color);">
+        <div class="max-w-5xl mx-auto flex flex-col gap-4">
+
+            <!-- TRANSPORT BAR -->
+            <div class="flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <button id="btnPlay" class="btn-primary h-12 w-16 rounded-lg font-bold text-xl flex items-center justify-center shadow-sm" title="Start/Resume">▶</button>
+                    <button id="btnPause" class="btn-icon h-12 w-12 rounded-lg font-bold text-xl shadow-sm" title="Pause">⏸</button>
+                    <button id="btnStop" class="btn-icon h-12 w-12 rounded-lg font-bold text-xl shadow-sm text-red-500 hover:text-red-600" title="Reset/Stop">⏹</button>
+                </div>
+
+                <div class="flex-1 px-4 hidden sm:block opacity-50">
+                    <div class="h-1 w-full bg-slate-200 dark:bg-slate-800 rounded overflow-hidden">
+                        <div id="miniProgress" class="h-full bg-cyan-500 w-0 transition-all duration-1000"></div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <button id="btnTheme" class="btn-icon h-10 w-10 rounded-full text-sm" title="Toggle Light/Dark Mode">☀</button>
+                    <button id="btnConfigToggle" class="btn-icon h-10 w-10 rounded-full text-lg" title="Konfiguration">⚙</button>
+                    <button id="btnHelp" class="btn-icon h-10 w-10 rounded-full text-sm font-bold" title="Hilfe & Konzept">?</button>
+                </div>
+            </div>
+
+            <!-- CONFIG PANEL -->
+            <div id="configContainer" class="collapsed">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 pt-2 border-t border-dashed" style="border-color: var(--border-color);">
+
+                    <!-- 1. TIMING -->
+                    <div class="lg:col-span-3 glass-panel p-3 rounded-xl flex flex-col gap-2">
+                        <!-- HEADER WITH END TIME -->
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="label-xs text-cyan-600 dark:text-cyan-400">Zielzeit (Ende)</span>
+                            <input type="time" id="targetTimeInput" class="text-xs font-mono font-bold">
+                        </div>
+                        
+                        <div class="grid grid-cols-3 gap-2 text-center">
+                            <div>
+                                <input type="number" id="t1_in" value="12" min="1" max="60">
+                                <div class="label-xs mt-1">In</div>
+                            </div>
+                            <div>
+                                <input type="number" id="t2_hold" value="42" min="1" max="180">
+                                <div class="label-xs mt-1">Hold</div>
+                            </div>
+                            <div>
+                                <input type="number" id="t3_out" value="6" min="1" max="60">
+                                <div class="label-xs mt-1">Out</div>
+                            </div>
+                        </div>
+                        <div class="text-right text-[10px] txt-main opacity-70 mt-1" id="totalDurationLabel">Total: 60m</div>
+                    </div>
+
+                    <!-- 2. FREQUENCY TOPOLOGY -->
+                    <div class="lg:col-span-5 glass-panel p-3 rounded-xl flex flex-col gap-3">
+                        <div class="label-xs text-purple-500 mb-1">Delta Topologie</div>
+                        
+                        <div class="grid grid-cols-3 gap-4 items-end">
+                            <div class="flex flex-col gap-1">
+                                <div class="flex justify-between text-[10px] txt-main"><span>Start</span><span id="dispDeltaStart">40Hz</span></div>
+                                <input type="range" id="slDeltaStart" class="slider-purple" min="0.5" max="40" step="0.5" value="40">
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <div class="flex justify-between text-[10px] font-bold txt-high"><span>Target</span><span id="dispDeltaTarget">4.4Hz</span></div>
+                                <input type="range" id="slDeltaTarget" class="slider-purple" min="0.5" max="40" step="0.1" value="4.4">
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <div class="flex justify-between text-[10px] txt-main"><span>End</span><span id="dispDeltaEnd">10Hz</span></div>
+                                <input type="range" id="slDeltaEnd" class="slider-purple" min="0.5" max="40" step="0.5" value="10">
+                            </div>
+                        </div>
+
+                        <div class="pt-2 mt-1 border-t border-dashed" style="border-color: var(--border-color);">
+                            <div class="flex justify-between text-[10px] txt-main mb-1"><span>Trägerfrequenz</span><span id="valBase">100 Hz</span></div>
+                            <input type="range" id="slBase" min="60" max="400" value="100">
+                        </div>
+                    </div>
+
+                    <!-- 3. MIXER -->
+                    <div class="lg:col-span-4 glass-panel p-3 rounded-xl flex flex-col gap-3">
+                        <div class="label-xs text-pink-500">Signal / Noise Mix</div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="flex flex-col gap-1">
+                                <div class="flex justify-between text-[10px] text-cyan-600 dark:text-cyan-400"><span>Binaural</span><span id="valVolSig">80%</span></div>
+                                <input type="range" id="slVolSig" min="0" max="100" value="80">
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <div class="flex justify-between text-[10px] text-pink-600 dark:text-pink-400"><span>Noise</span><span id="valVolNoise">3%</span></div>
+                                <input type="range" id="slVolNoise" class="slider-pink" min="0" max="50" value="3">
+                            </div>
+                        </div>
+                        <div class="mt-auto text-[10px] txt-main text-center opacity-60 pt-2">Entropy Masking enabled.</div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HELP MODAL -->
+    <div id="helpModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 modal-backdrop transition-opacity" id="modalBackdrop"></div>
+        <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div class="glass-panel max-w-2xl w-full rounded-2xl shadow-2xl p-6 relative animate-slide-up overflow-y-auto max-h-[90vh]" style="background-color: var(--bg-main);">
+                
+                <div class="flex justify-between items-center mb-6 border-b border-dashed pb-4" style="border-color: var(--border-color);">
+                    <h2 class="text-xl font-bold txt-high flex items-center gap-2">
+                        <span class="text-cyan-500">Open</span> Entrainer
+                    </h2>
+                    <button id="btnCloseModal" class="btn-icon h-8 w-8 rounded-full text-sm">✕</button>
+                </div>
+
+                <div class="space-y-6 text-sm txt-main">
+                    
+                    <section>
+                        <h3 class="font-bold txt-high mb-2 flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>
+                            Funktionsweise
+                        </h3>
+                        <p class="leading-relaxed">
+                            Dieses Tool nutzt <strong>binaurale Beats</strong>, um eine Frequenzfolgereaktion (Frequency Following Response, FFR) im Hirnstamm zu induzieren. Durch die Präsentation zweier leicht unterschiedlicher Frequenzen (z.B. 100 Hz und 104 Hz) konstruiert der <em>Nucleus olivaris superior</em> eine Phantompulsation von 4 Hz (Theta).
+                        </p>
+                        <p class="leading-relaxed mt-2">
+                            Die Frequenzübergänge folgen dabei keiner linearen, sondern einer <strong>logarithmisch-sigmoidalen Kurve</strong>. Dies simuliert natürliche biologische Zustandsänderungen (Inertia) und minimiert physiologischen Widerstand.
+                        </p>
+                    </section>
+
+                    <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-3 rounded-lg border border-dashed" style="border-color: var(--border-color);">
+                            <h4 class="font-bold text-pink-500 mb-1 text-xs uppercase">Stochastische Maskierung</h4>
+                            <p class="text-xs opacity-80">
+                                Pink Noise (1/f-Rauschen) wird genutzt, um externe akustische Störungen zu überdecken und die Aufmerksamkeitsschwelle für die reinen Sinustöne zu senken (Psychoakustische Verdeckung).
+                            </p>
+                        </div>
+                        <div class="p-3 rounded-lg border border-dashed" style="border-color: var(--border-color);">
+                            <h4 class="font-bold text-purple-500 mb-1 text-xs uppercase">Prozess-Topologie</h4>
+                            <p class="text-xs opacity-80">
+                                <strong>Ramp In:</strong> Induktion & Synchronisation.<br>
+                                <strong>Hold:</strong> Stabilisierung des Zielzustands (Neuroplastizität).<br>
+                                <strong>Ramp Out:</strong> Re-Integration in den Wachzustand.
+                            </p>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h3 class="font-bold txt-high mb-2 flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>
+                            Bedienung
+                        </h3>
+                        <p class="leading-relaxed mb-2">
+                            Wählen Sie im Feld <strong>"Zielzeit"</strong> den gewünschten Endzeitpunkt der Sitzung. Der Algorithmus berechnet automatisch die optimale Dauer der <em>Hold-Phase</em>, um die Rampen-Parameter einzuhalten.
+                        </p>
+                        <div class="bg-slate-500/10 p-2 rounded text-xs font-mono flex gap-2 items-center">
+                            <span class="text-lg">🎧</span>
+                            <span>Stereo-Kopfhörer sind zwingend erforderlich.</span>
+                        </div>
+                    </section>
+
+                    <section class="pt-4 border-t border-dashed" style="border-color: var(--border-color);">
+                        <div class="text-[10px] opacity-60 flex justify-between items-center">
+                            <span>OPEN SOURCE / SOVEREIGN TECH</span>
+                            <span class="font-mono">LICENSE: UNLICENSE (PUBLIC DOMAIN)</span>
+                        </div>
+                        <p class="text-[10px] opacity-50 mt-1 leading-tight">
+                            Diese Software ist frei von Urheberrechten. Sie können sie kopieren, modifizieren, verteilen und für jeden Zweck nutzen, ohne Erlaubnis einzuholen.
+                        </p>
+                    </section>
+
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-dashed flex justify-end" style="border-color: var(--border-color);">
+                    <button id="btnGotIt" class="btn-primary px-6 py-2 rounded-lg font-bold text-xs uppercase tracking-widest">Schließen</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const VISUAL_RANGE_HZ = 45; 
+        let ctxAudio = null;
+        let isPlaying = false;
+        let isPaused = false;
+        let animationId;
+        let isLightMode = true; 
+        let sessionTime = 0;
+        let totalDuration = 0;
+        let lastFrameTime = 0;
+        
+        let times = { t1: 0, t2: 0, t3: 0 };
+        let deltas = { start: 40, target: 4.4, end: 10 };
+        let nodes = { oscL: null, oscR: null, gainL: null, gainR: null, noise: null, noiseGain: null };
+
+        const ui = {
+            cvs: document.getElementById('waterfall'),
+            scanLine: document.getElementById('scanLine'),
+            miniProgress: document.getElementById('miniProgress'),
+            btnPlay: document.getElementById('btnPlay'),
+            btnPause: document.getElementById('btnPause'),
+            btnStop: document.getElementById('btnStop'),
+            btnTheme: document.getElementById('btnTheme'),
+            btnConfig: document.getElementById('btnConfigToggle'),
+            btnHelp: document.getElementById('btnHelp'),
+            modal: document.getElementById('helpModal'),
+            modalBackdrop: document.getElementById('modalBackdrop'),
+            btnCloseModal: document.getElementById('btnCloseModal'),
+            btnGotIt: document.getElementById('btnGotIt'),
+            configContainer: document.getElementById('configContainer'),
+            t1: document.getElementById('t1_in'), t2: document.getElementById('t2_hold'), t3: document.getElementById('t3_out'),
+            totalTimeDisplay: document.getElementById('totalDurationLabel'),
+            targetTimeInput: document.getElementById('targetTimeInput'),
+            dStart: document.getElementById('slDeltaStart'), dTarget: document.getElementById('slDeltaTarget'), dEnd: document.getElementById('slDeltaEnd'),
+            dDispS: document.getElementById('dispDeltaStart'), dDispT: document.getElementById('dispDeltaTarget'), dDispE: document.getElementById('dispDeltaEnd'),
+            base: document.getElementById('slBase'), valBase: document.getElementById('valBase'),
+            volSig: document.getElementById('slVolSig'), valVolSig: document.getElementById('valVolSig'),
+            volNoise: document.getElementById('slVolNoise'), valVolNoise: document.getElementById('valVolNoise'),
+            state: document.getElementById('stateDisplay'), clock: document.getElementById('timeDisplay'),
+            liveDelta: document.getElementById('deltaDisplay'), liveL: document.getElementById('freqL'), liveR: document.getElementById('freqR'),
+            rangeBadge: document.getElementById('rangeBadge')
+        };
+
+        const cvsCtx = ui.cvs.getContext('2d', { alpha: false });
+        let vizW, vizH;
+
+        function easeInOutCubic(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+        const organicLogInterp = (a, b, t) => {
+            const safeA = Math.max(0.1, a);
+            const safeB = Math.max(0.1, b);
+            return safeA * Math.pow(safeB / safeA, easeInOutCubic(t));
+        };
+
+        function getDeltaAtTime(t) {
+            if (t <= times.t1) return organicLogInterp(deltas.start, deltas.target, t / times.t1);
+            else if (t <= (times.t1 + times.t2)) return deltas.target;
+            else if (t <= totalDuration) return organicLogInterp(deltas.target, deltas.end, (t - (times.t1 + times.t2)) / times.t3);
+            return deltas.end;
+        }
+
+        // --- AUDIO ---
+        function createPinkNoise(ctx) {
+            const bufferSize = ctx.sampleRate * 2; 
+            const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+            const source = ctx.createBufferSource();
+            source.buffer = buffer;
+            source.loop = true;
+            const filter = ctx.createBiquadFilter();
+            filter.type = "lowshelf";
+            filter.frequency.value = 1000; filter.gain.value = -14; 
+            source.connect(filter);
+            return { source, output: filter };
+        }
+
+        function initAudio() {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            ctxAudio = new AudioContext();
+            const merger = ctxAudio.createChannelMerger(2);
+            merger.connect(ctxAudio.destination);
+            nodes.oscL = ctxAudio.createOscillator(); nodes.oscR = ctxAudio.createOscillator();
+            nodes.gainL = ctxAudio.createGain(); nodes.gainR = ctxAudio.createGain();
+            nodes.oscL.connect(nodes.gainL).connect(merger, 0, 0);
+            nodes.oscR.connect(nodes.gainR).connect(merger, 0, 1);
+            const noiseSystem = createPinkNoise(ctxAudio);
+            nodes.noise = noiseSystem.source; nodes.noiseGain = ctxAudio.createGain();
+            noiseSystem.output.connect(nodes.noiseGain);
+            nodes.noiseGain.connect(merger, 0, 0); nodes.noiseGain.connect(merger, 0, 1);
+            nodes.oscL.start(); nodes.oscR.start(); nodes.noise.start();
+            applyVolumes();
+        }
+
+        function applyVolumes() {
+            if(!ctxAudio) return;
+            const vSig = parseInt(ui.volSig.value) / 100;
+            const vNoise = parseInt(ui.volNoise.value) / 100;
+            nodes.gainL.gain.setTargetAtTime(vSig * 0.5, ctxAudio.currentTime, 0.1);
+            nodes.gainR.gain.setTargetAtTime(vSig * 0.5, ctxAudio.currentTime, 0.1);
+            nodes.noiseGain.gain.setTargetAtTime(vNoise * 0.25, ctxAudio.currentTime, 0.1); 
+        }
+
+        function updateAudio(delta) {
+            if(!ctxAudio) return;
+            const base = parseInt(ui.base.value);
+            const lHz = base - (delta / 2); const rHz = base + (delta / 2);
+            nodes.oscL.frequency.setTargetAtTime(lHz, ctxAudio.currentTime, 0.05);
+            nodes.oscR.frequency.setTargetAtTime(rHz, ctxAudio.currentTime, 0.05);
+            ui.liveL.innerText = lHz.toFixed(1); ui.liveR.innerText = rHz.toFixed(1);
+            ui.liveDelta.innerText = delta.toFixed(2) + " Hz";
+            
+            let rName = "", rColor = "";
+            if (delta < 4) { rName = "DELTA"; rColor = "#3b82f6"; }       
+            else if (delta < 8) { rName = "THETA"; rColor = "#06b6d4"; }  
+            else if (delta < 13) { rName = "ALPHA"; rColor = "#8b5cf6"; } 
+            else if (delta < 30) { rName = "BETA"; rColor = "#ec4899"; }  
+            else { rName = "GAMMA"; rColor = "#eab308"; }                 
+            ui.rangeBadge.innerText = rName; ui.rangeBadge.style.color = rColor; ui.rangeBadge.style.borderColor = rColor;
+        }
+
+        // --- TIME LOGIC ---
+        function updateTargetTimeDisplay() {
+            const now = new Date();
+            const totalMins = parseInt(ui.t1.value) + parseInt(ui.t2.value) + parseInt(ui.t3.value);
+            const targetTime = new Date(now.getTime() + totalMins * 60000);
+            const hh = targetTime.getHours().toString().padStart(2, '0');
+            const mm = targetTime.getMinutes().toString().padStart(2, '0');
+            ui.targetTimeInput.value = `${hh}:${mm}`;
+        }
+
+        function updateDurationFromTarget() {
+            if(!ui.targetTimeInput.value) return;
+            const now = new Date();
+            const [th, tm] = ui.targetTimeInput.value.split(':').map(Number);
+            const target = new Date();
+            target.setHours(th, tm, 0, 0);
+            if (target < now) target.setDate(target.getDate() + 1);
+            const diffMs = target - now;
+            const diffMins = Math.floor(diffMs / 60000);
+            if(diffMins <= 0) return; 
+            const t1 = parseInt(ui.t1.value);
+            const t3 = parseInt(ui.t3.value);
+            let newHold = diffMins - (t1 + t3);
+            if (newHold < 1) newHold = 1; 
+            ui.t2.value = newHold;
+            updateConfig(false); 
+        }
+
+        // --- CONTROLS ---
+        function onPlay() {
+            if(isPlaying) return; 
+            if(!ctxAudio) initAudio();
+            if(ctxAudio.state === 'suspended') ctxAudio.resume();
+            isPlaying = true; isPaused = false;
+            ui.state.innerText = "RUNNING"; ui.state.className = "font-bold text-lg text-cyan-500 animate-pulse";
+            ui.scanLine.classList.remove('hidden');
+            if(sessionTime === 0) {
+                ui.configContainer.classList.add('collapsed');
+                ui.btnConfig.classList.remove('active');
+                updateTargetTimeDisplay(); 
+            }
+            lastFrameTime = performance.now();
+            loop();
+        }
+
+        function onPause() {
+            if(!isPlaying) return;
+            isPlaying = false; isPaused = true;
+            if(ctxAudio) ctxAudio.suspend();
+            cancelAnimationFrame(animationId);
+            ui.state.innerText = "PAUSED"; ui.state.className = "font-bold text-lg txt-main";
+        }
+
+        function onStop() {
+            isPlaying = false; isPaused = false; sessionTime = 0;
+            if(ctxAudio) { ctxAudio.close(); ctxAudio = null; }
+            cancelAnimationFrame(animationId);
+            ui.state.innerText = "READY"; ui.state.className = "font-bold text-lg txt-main";
+            ui.scanLine.classList.add('hidden'); ui.scanLine.style.top = '0px'; ui.miniProgress.style.width = '0%';
+            updateConfig(); 
+        }
+
+        // Modal Logic
+        function openModal() { ui.modal.classList.remove('hidden'); }
+        function closeModal() { ui.modal.classList.add('hidden'); }
+
+        ui.btnHelp.addEventListener('click', openModal);
+        ui.btnCloseModal.addEventListener('click', closeModal);
+        ui.btnGotIt.addEventListener('click', closeModal);
+        ui.modalBackdrop.addEventListener('click', closeModal);
+
+        ui.btnPlay.addEventListener('click', onPlay);
+        ui.btnPause.addEventListener('click', onPause);
+        ui.btnStop.addEventListener('click', onStop);
+        ui.btnConfig.addEventListener('click', () => {
+            ui.configContainer.classList.toggle('collapsed');
+            ui.btnConfig.classList.toggle('active');
+        });
+
+        // --- LOOP ---
+        function updateConfig(recalcTarget = true) {
+            times.t1 = (parseInt(ui.t1.value) || 1) * 60;
+            times.t2 = (parseInt(ui.t2.value) || 1) * 60;
+            times.t3 = (parseInt(ui.t3.value) || 1) * 60;
+            totalDuration = times.t1 + times.t2 + times.t3;
+            
+            ui.totalTimeDisplay.innerText = `Total: ${(totalDuration/60).toFixed(0)}m`;
+            if(recalcTarget) updateTargetTimeDisplay();
+
+            deltas.start = parseFloat(ui.dStart.value);
+            deltas.target = parseFloat(ui.dTarget.value);
+            deltas.end = parseFloat(ui.dEnd.value);
+            ui.dDispS.innerText = deltas.start + "Hz"; ui.dDispT.innerText = deltas.target + "Hz"; ui.dDispE.innerText = deltas.end + "Hz";
+            ui.valBase.innerText = ui.base.value + " Hz"; ui.valVolSig.innerText = ui.volSig.value + "%"; ui.valVolNoise.innerText = ui.volNoise.value + "%";
+            applyVolumes(); drawMap();
+            
+            if (!isPlaying) {
+                const startDelta = getDeltaAtTime(0);
+                let rName = "", rColor = "";
+                if(startDelta < 4) { rName="DELTA"; rColor="#3b82f6"; }
+                else if(startDelta < 8) { rName="THETA"; rColor="#06b6d4"; }
+                else if(startDelta < 13) { rName="ALPHA"; rColor="#8b5cf6"; }
+                else if(startDelta < 30) { rName="BETA"; rColor="#ec4899"; }
+                else { rName="GAMMA"; rColor="#eab308"; }
+                ui.rangeBadge.innerText = rName; ui.rangeBadge.style.color = rColor; ui.rangeBadge.style.borderColor = rColor;
+            }
+        }
+
+        function loop() {
+            if(!isPlaying) return;
+            const now = performance.now();
+            const dt = (now - lastFrameTime) / 1000;
+            lastFrameTime = now;
+            sessionTime += dt;
+            if(sessionTime >= totalDuration) { onStop(); ui.state.innerText = "COMPLETED"; return; }
+            const delta = getDeltaAtTime(sessionTime);
+            updateAudio(delta);
+            const m = Math.floor(sessionTime / 60).toString().padStart(2, '0');
+            const s = Math.floor(sessionTime % 60).toString().padStart(2, '0');
+            const tm = Math.floor(totalDuration / 60).toString().padStart(2, '0');
+            ui.clock.innerText = `${m}:${s} / ${tm}:00`;
+            const y = (sessionTime / totalDuration) * vizH;
+            ui.scanLine.style.top = `${y}px`;
+            ui.miniProgress.style.width = `${(sessionTime / totalDuration) * 100}%`;
+            animationId = requestAnimationFrame(loop);
+        }
+
+        // --- EVENTS ---
+        function resize() {
+            vizW = ui.cvs.width = ui.cvs.parentElement.clientWidth;
+            vizH = ui.cvs.height = ui.cvs.parentElement.clientHeight;
+            updateConfig();
+        }
+        function toggleTheme() {
+            isLightMode = !isLightMode;
+            document.body.classList.toggle('dark-mode');
+            ui.btnTheme.innerText = isLightMode ? "☀" : "☾";
+            drawMap(); 
+        }
+        ui.btnTheme.addEventListener('click', toggleTheme);
+        window.addEventListener('resize', resize);
+        
+        [ui.t1, ui.t2, ui.t3, ui.base, ui.dStart, ui.dTarget, ui.dEnd, ui.volSig, ui.volNoise].forEach(el => {
+            el.addEventListener('input', () => updateConfig(true));
+        });
+        ui.targetTimeInput.addEventListener('change', updateDurationFromTarget);
+
+        setTimeout(() => {
+            resize();
+        }, 100);
+
+        function drawMap() {
+            if(!vizW || !vizH) return;
+            const style = getComputedStyle(document.body);
+            const colBg = style.getPropertyValue('--cvs-bg').trim();
+            const colGrid = style.getPropertyValue('--cvs-grid').trim();
+            const colAxis = style.getPropertyValue('--cvs-axis').trim();
+            cvsCtx.fillStyle = colBg; cvsCtx.fillRect(0, 0, vizW, vizH);
+            const y1 = (times.t1 / totalDuration) * vizH; const y2 = ((times.t1 + times.t2) / totalDuration) * vizH;
+            cvsCtx.strokeStyle = colGrid; cvsCtx.lineWidth = 1; cvsCtx.setLineDash([5, 5]);
+            cvsCtx.beginPath(); cvsCtx.moveTo(0, y1); cvsCtx.lineTo(vizW, y1); cvsCtx.stroke();
+            cvsCtx.beginPath(); cvsCtx.moveTo(0, y2); cvsCtx.lineTo(vizW, y2); cvsCtx.stroke();
+            cvsCtx.setLineDash([]);
+            cvsCtx.strokeStyle = colAxis; cvsCtx.beginPath(); cvsCtx.moveTo(vizW/2, 0); cvsCtx.lineTo(vizW/2, vizH); cvsCtx.stroke();
+            const pxPerHz = vizW / (VISUAL_RANGE_HZ * 2);
+            for(let y = 0; y < vizH; y+=1) {
+                const t = (y / vizH) * totalDuration; const delta = getDeltaAtTime(t);
+                const xL = (vizW / 2) - (delta/2 * pxPerHz); const xR = (vizW / 2) + (delta/2 * pxPerHz);
+                let r, g, b;
+                if(delta < 4) { r=59; g=130; b=246; } else if(delta < 8) { r=6; g=182; b=212; } else if(delta < 13) { r=139; g=92; b=246; } else if(delta < 30) { r=236; g=72; b=153; } else { r=234; g=179; b=8; }               
+                const isDark = !isLightMode; const bgOp = isDark ? 0.1 : 0.05; const trOp = isDark ? 0.8 : 0.6;
+                cvsCtx.fillStyle = `rgba(${r}, ${g}, ${b}, ${bgOp})`; cvsCtx.fillRect(xL, y, xR - xL, 1);
+                cvsCtx.fillStyle = `rgba(${r}, ${g}, ${b}, ${trOp})`; cvsCtx.fillRect(xL, y, 2, 1); cvsCtx.fillRect(xR, y, 2, 1);
+            }
+        }
+    </script>
+</body>
+</html>
