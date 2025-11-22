@@ -36,15 +36,15 @@ Nutze das Tool, um eine tiefe Trance zu induzieren, die notwendig ist, um das kr
 
 ## Features
 
-* ** Volle Parametrisierung:** Kontrolle über Start-, Ziel- und End-Frequenzen sowie Trägerfrequenz (Base Carrier).
-* ** 3-Phasen-Topologie:**
+* **Volle Parametrisierung:** Kontrolle über Start-, Ziel- und End-Frequenzen sowie Trägerfrequenz (Base Carrier).
+* **3-Phasen-Topologie:**
     1.  **Ramp In:** Sanftes Absenken der Gehirnwellen (Induktion).
     2.  **Hold:** Stabilisieren des Zielzustandes (z.B. für Astralprojektion oder Deep Meditation).
     3.  **Ramp Out:** Sicheres Zurückführen in den Wachzustand.
-* ** Organische Interpolation:** Frequenzübergänge erfolgen nicht linear, sondern über eine logaritmisch-sigmoidale Kurve, um physiologischen Widerstand zu minimieren.
-* ** Pink Noise Masking:** Eingebauter Generator für rosa Rauschen (1/f), um Umgebungsgeräusche auszublenden und die binauralen Töne psychoakustisch angenehmer zu machen.
-* ** Zielzeit-Automatik:** Gib an, wann deine Session beendet sein soll (z.B. 07:00 Uhr morgens), und der Algorithmus berechnet automatisch die perfekte Länge der `Hold`-Phase.
-* ** Privacy First / Sovereign Tech:** Die App läuft zu 100% lokal in deinem Browser (Client-Side). Keine Daten verlassen dein Gerät. Keine Tracker. Keine Werbung.
+* **Organische Interpolation:** Frequenzübergänge erfolgen nicht linear, sondern über eine logaritmisch-sigmoidale Kurve, um physiologischen Widerstand zu minimieren.
+* **Pink Noise Masking:** Eingebauter Generator für rosa Rauschen (1/f), um Umgebungsgeräusche auszublenden und die binauralen Töne psychoakustisch angenehmer zu machen.
+* **Zielzeit-Automatik:** Gib an, wann deine Session beendet sein soll (z.B. 07:00 Uhr morgens), und der Algorithmus berechnet automatisch die perfekte Länge der `Hold`-Phase.
+* **Privacy First / Sovereign Tech:** Die App läuft zu 100% lokal in deinem Browser (Client-Side). Keine Daten verlassen dein Gerät. Keine Tracker. Keine Werbung.
 
 ---
 
@@ -96,6 +96,4 @@ Wissen und Werkzeuge zur Bewusstseinserweiterung sollten frei sein.
 
 -----
 
-\<p align="center"\>
 Made with 🤍 in Regensburg.
-\</p\>
