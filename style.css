@@ -1,0 +1,396 @@
+/* Design tokens, shared with temet-nosce.
+   Color is strictly achromatic: oklch with chroma 0 cannot tint, light and
+   dark share one scale and flip with prefers-color-scheme. Geometry derives
+   from φ: the spacing ladder is the Fibonacci sequence, the type scale is
+   powers of φ. */
+
+:root {
+  color-scheme: light dark;
+  --bg: oklch(98% 0 0);
+  --surface: oklch(94% 0 0);
+  --border: oklch(85% 0 0);
+  --text: oklch(15% 0 0);
+  --text-muted: oklch(40% 0 0);
+
+  --space-1: 5px;
+  --space-2: 8px;
+  --space-3: 13px;
+  --space-4: 21px;
+  --space-5: 34px;
+  --space-6: 55px;
+  --space-7: 89px;
+  --space-8: 144px;
+  --radius-sm: var(--space-1);
+  --radius-md: var(--space-2);
+  --radius-lg: var(--space-3);
+
+  --text-sm: 0.875rem;     /* 14px, captions; deliberately not 1/φ, legibility floor */
+  --text-base: 1rem;       /* browser default, respects user zoom */
+  --text-lg: 1.618rem;     /* φ¹ */
+  --text-xl: 2.618rem;     /* φ² */
+  --text-2xl: 4.236rem;    /* φ³ */
+
+  font-family: system-ui, sans-serif;
+  font-size: var(--text-base);
+  line-height: 1.618;
+  background: var(--bg);
+  color: var(--text);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: oklch(15% 0 0);
+    --surface: oklch(20% 0 0);
+    --border: oklch(30% 0 0);
+    --text: oklch(95% 0 0);
+    --text-muted: oklch(70% 0 0);
+  }
+}
+
+body {
+  margin: 0;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.shell {
+  max-width: 987px;
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+a {
+  color: inherit;
+  text-underline-offset: 3px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--text-muted);
+  outline-offset: 2px;
+}
+
+/* Hero */
+
+.hero {
+  padding-block: var(--space-8) var(--space-6);
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(var(--text-xl), 9vw, var(--text-2xl));
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.hero p {
+  margin: var(--space-4) 0 0;
+  max-width: 34rem;
+  color: var(--text-muted);
+}
+
+/* Sections */
+
+main section {
+  margin: 0 0 var(--space-7);
+}
+
+main h2 {
+  margin: 0 0 var(--space-4);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+main h3 {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 400;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+main section > p,
+main section > ul {
+  margin: 0 0 var(--space-3);
+  max-width: 42rem;
+}
+
+main section > ul {
+  padding-left: var(--space-4);
+}
+
+main section > ul li {
+  margin-bottom: var(--space-1);
+}
+
+.caption {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+table {
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+  margin: 0 0 var(--space-3);
+}
+
+th,
+td {
+  text-align: left;
+  padding: var(--space-1) var(--space-4) var(--space-1) 0;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+th {
+  font-weight: 600;
+}
+
+/* Controls: a labelled slider or field. The label row carries the name on the
+   left and the live value on the right. */
+
+.controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(233px, 1fr));
+  gap: var(--space-4) var(--space-5);
+  max-width: 42rem;
+  margin: 0 0 var(--space-4);
+}
+
+.control {
+  display: block;
+}
+
+.control-label {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  font-size: var(--text-sm);
+  margin-bottom: var(--space-1);
+}
+
+.control-label output {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.control-check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+}
+
+input[type="range"],
+input[type="checkbox"] {
+  accent-color: var(--text);
+}
+
+input[type="range"] {
+  display: block;
+  width: 100%;
+  margin: 0;
+}
+
+input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+}
+
+input[type="number"],
+input[type="time"] {
+  font: inherit;
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-2);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+input[type="number"]:focus-visible,
+input[type="time"]:focus-visible {
+  outline-offset: 0;
+}
+
+/* Buttons. The primary button is inverted like a user message in temet-nosce:
+   text-colored surface, background-colored label. */
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-3);
+}
+
+.button {
+  font: inherit;
+  font-size: var(--text-sm);
+  color: var(--text);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-4);
+  cursor: pointer;
+}
+
+.button:hover {
+  background: var(--surface);
+}
+
+.button:disabled {
+  color: var(--text-muted);
+  cursor: default;
+  background: none;
+}
+
+.button.primary {
+  color: var(--bg);
+  background: var(--text);
+  border-color: var(--text);
+}
+
+.button.primary:hover {
+  background: var(--text-muted);
+  border-color: var(--text-muted);
+}
+
+.button.primary:disabled {
+  background: var(--border);
+  border-color: var(--border);
+  color: var(--text-muted);
+}
+
+/* Footer */
+
+footer {
+  border-top: 1px solid var(--border);
+  padding: var(--space-5) 0 var(--space-6);
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+@media (max-width: 800px) {
+  .hero {
+    padding-block-start: var(--space-7);
+  }
+}
+
+/* Visualization: a golden rectangle that draws the planned beat over time,
+   with the live readouts in its corners. The canvas carries the page tokens as
+   its own colors so app.js can read resolved values from it (canvas fillStyle
+   wants a concrete color, and the tokens are oklch). */
+
+.viz {
+  position: relative;
+  aspect-ratio: 1.618;
+  max-height: 610px;
+  margin: 0 0 var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.viz canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+  outline-color: var(--text-muted);
+}
+
+.hud {
+  position: absolute;
+  top: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.hud-left {
+  left: var(--space-3);
+}
+
+.hud-right {
+  right: var(--space-3);
+  text-align: right;
+}
+
+.hud-label {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.hud-value {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.hud-small {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+/* Settings panels: three bordered boxes that wrap to one column when narrow */
+
+.panels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(233px, 1fr));
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.panel {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.panel .caption {
+  margin: auto 0 0;
+}
+
+.fields {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.field {
+  display: grid;
+  grid-template-columns: 1fr 5.5rem 3.5rem;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+}
+
+.field .unit {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 480px) {
+  .viz {
+    aspect-ratio: 1;
+  }
+  .hud-value {
+    font-size: var(--text-base);
+  }
+}

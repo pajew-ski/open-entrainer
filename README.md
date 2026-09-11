@@ -1,99 +1,50 @@
-# Open Entrainer
+# open entrainer
 
-> **Ein Open-Source Binaural Beat Generator für Bewusstseinserforschung, Meditation und Deep Focus.**
+A binaural beat generator in the browser. Two tones a few hertz apart, one in each ear, ramped along a curve you set, with pink noise underneath to cover the room. One HTML file, one stylesheet, one script, nothing else.
 
-[![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)
-[![Status: Live](https://img.shields.io/badge/Status-Live_Demo-green)](https://pajew-ski.github.io/open-entrainer/)
+**Site**: [pajew-ski.github.io/open-entrainer](https://pajew-ski.github.io/open-entrainer/)
 
-**Open Entrainer** ist eine webbasierte Single-Page-Application (SPA), die präzise binaurale Frequenzen erzeugt, um Gehirnwellen in gewünschte Zustände zu führen (Brainwave Entrainment). Anders als starre MP3-Dateien generiert diese App die Töne in Echtzeit im Browser, erlaubt volle Kontrolle über die Frequenz-Topologie und nutzt stochastisches Rauschen zur psychoakustischen Maskierung.
+## How it works
 
- **Live Demo:** [https://pajew-ski.github.io/open-entrainer/](https://pajew-ski.github.io/open-entrainer/)
+The left ear gets the carrier minus half the beat, the right ear the carrier plus half the beat. With a 100 Hz carrier and a 4 Hz beat that is 98 Hz and 102 Hz. The brainstem constructs a pulse at the difference, and over minutes brainwave activity tends to drift toward it. This requires headphones; through speakers the two tones mix in the air and there is no beat.
 
----
+A session has three phases: ramp in from a waking frequency to the target, hold at the target, ramp out to an end frequency. Transitions follow a logarithmic curve with cubic ease at both ends. Instead of typing durations you can set the clock time the session should end at, and the hold stretches to meet it.
 
-## Anwendungsbereiche
+The page draws the plan as a band around a center line, time running downward, with the brainwave band boundaries as faint vertical lines. While it plays, a horizontal line marks the current position and the corners show the live beat, band, and both ear frequencies.
 
-Dieses Tool ist mehr als nur eine Entspannungs-App. Durch die gezielte Manipulation der `Hold`-Phase und der Frequenzbereiche eignet es sich für verschiedene Bewusstseinstechniken:
+Everything is generated while it plays. Nothing is downloaded, nothing is sent anywhere. The settings are kept in `localStorage`.
 
-### Meditation & Entspannung
-Nutze Alpha- (8-13 Hz) oder Theta-Wellen (4-8 Hz), um den Geist schnell zu beruhigen, Stress abzubauen und tiefe meditative Zustände zu erreichen, ohne jahrelanges Training.
+| Band | Beat | Typically |
+| --- | --- | --- |
+| Delta | below 4 Hz | deep sleep |
+| Theta | 4 to 8 Hz | drowsiness, trance, the edge of sleep |
+| Alpha | 8 to 13 Hz | relaxed wakefulness, eyes closed |
+| Beta | 13 to 30 Hz | ordinary alert thinking |
+| Gamma | above 30 Hz | focused attention |
 
-### Astralreisen & Außerkörperliche Erfahrungen (OBE)
-Der Open Entrainer ist speziell darauf ausgelegt, den **"Mind Awake / Body Asleep"** Zustand zu unterstützen, der für Astralreisen (OBE) notwendig ist.
-* **Empfehlung:** Setze die Ziel-Frequenz auf den unteren Theta-Bereich (ca. 4.5 Hz) oder oberen Delta-Bereich.
-* **Technik:** Die `Ramp-In` Phase führt den Körper in den Schlaf, während die lange `Hold`-Phase den Geist an der Schwelle zum Traum wach hält. Dies begünstigt den Schwingungszustand und den Austritt.
+## Using it
 
-### WBTB & Klarträumen (Lucid Dreaming)
-Ideal für die **WBTB-Methode** (Wake Back To Bed). Stelle den Timer so ein, dass du während einer kurzen Wachphase in der Nacht in den Theta-Bereich geführt wirst, um bewusst in einen Traum einzusteigen (WILD-Technik).
+1. Put on stereo headphones and keep the volume low.
+2. Pick a target beat. Around 4 to 6 Hz for sleep onset or a long lying meditation, 8 to 10 Hz for resting with eyes closed, 14 to 20 Hz for focused work.
+3. Set the ramp in, hold, and ramp out in minutes, or set an end time and let the hold adjust.
+4. Start, close your eyes, and let it run. Space starts and pauses. The session stops itself at the end.
 
-### Deep Work & Fokus
-Nutze Beta- (14-30 Hz) oder Gamma-Frequenzen (40 Hz+), um kognitive Leistung, Fokus und Problemlösefähigkeiten zu steigern (Biohacking).
+## Before you use it
 
-### Quantum Jumping / Reality Shifting
-Nutze das Tool, um eine tiefe Trance zu induzieren, die notwendig ist, um das kritische Bewusstsein zu umgehen und neue Intentionen im Unterbewusstsein zu verankern (Neuprogrammierung).
+This is a self-help tool, not a medical device, and it does not treat anything. Do not use it while driving or operating anything that needs your attention. With epilepsy, a pacemaker, or a psychiatric condition, ask a clinician first. Stop if you feel unwell.
 
----
-
-## Features
-
-* **Volle Parametrisierung:** Kontrolle über Start-, Ziel- und End-Frequenzen sowie Trägerfrequenz (Base Carrier).
-* **3-Phasen-Topologie:**
-    1.  **Ramp In:** Sanftes Absenken der Gehirnwellen (Induktion).
-    2.  **Hold:** Stabilisieren des Zielzustandes (z.B. für Astralprojektion oder Deep Meditation).
-    3.  **Ramp Out:** Sicheres Zurückführen in den Wachzustand.
-* **Organische Interpolation:** Frequenzübergänge erfolgen nicht linear, sondern über eine logaritmisch-sigmoidale Kurve, um physiologischen Widerstand zu minimieren.
-* **Pink Noise Masking:** Eingebauter Generator für rosa Rauschen (1/f), um Umgebungsgeräusche auszublenden und die binauralen Töne psychoakustisch angenehmer zu machen.
-* **Zielzeit-Automatik:** Gib an, wann deine Session beendet sein soll (z.B. 07:00 Uhr morgens), und der Algorithmus berechnet automatisch die perfekte Länge der `Hold`-Phase.
-* **Privacy First / Sovereign Tech:** Die App läuft zu 100% lokal in deinem Browser (Client-Side). Keine Daten verlassen dein Gerät. Keine Tracker. Keine Werbung.
-
----
-
-## Nutzung
-
-1.  **Kopfhörer aufsetzen:** Binaurale Beats funktionieren physikalisch nur mit Stereo-Kopfhörern (ein Ton links, ein Ton rechts -> Gehirn erzeugt den Differenzton).
-2.  **Konfiguration:** Klicke auf das Zahnrad.
-    * Wähle deine Ziel-Frequenz (z.B. 4.4 Hz für tiefe Trance).
-    * Stelle die Dauer der Phasen ein (In / Hold / Out).
-3.  **Starten:** Klicke auf Play.
-4.  **Augen schließen:** Lass dich von den Frequenzen führen.
-
----
-
-## Installation (Lokal)
-
-Da es sich um eine statische Web-App handelt, ist keine komplexe Installation nötig.
+## Running it locally
 
 ```bash
-# Repository klonen
-git clone [https://github.com/pajew-ski/open-entrainer.git](https://github.com/pajew-ski/open-entrainer.git)
-
-# In das Verzeichnis wechseln
+git clone https://github.com/pajew-ski/open-entrainer.git
 cd open-entrainer
-
-# Die index.html einfach im Browser öffnen
 open index.html
-````
+```
 
-Alternativ kannst du es auf jedem statischen Webhoster (GitHub Pages, Vercel, Netlify) deployen.
+There is no build step and no dependency. Any static host serves it as is; on GitHub Pages, deploy from the root of `main`. The footer links adapt to a fork automatically.
 
------
+Everything here was built by a coding agent from [AGENTS.md](AGENTS.md), which is the design and behavior spec of the tool.
 
-## Tech Stack
+## License
 
-  * **HTML5 Canvas:** Für die Echtzeit-Visualisierung (Waterfall Plot).
-  * **Web Audio API:** Für die präzise Oszillator-Generierung und das Audio-Mixing.
-  * **Tailwind CSS:** Für das responsive UI und das Dark-Mode Styling.
-  * **Vanilla JS:** Kein Framework-Overhead, maximale Performance.
-
------
-
-## Lizenz
-
-Dieses Projekt ist unter der **Unlicense** veröffentlicht. Das bedeutet, es ist **Public Domain**.
-Du kannst den Code kopieren, verändern, verkaufen oder als Basis für eigene (kommerzielle oder private) Projekte nutzen, ohne um Erlaubnis zu fragen.
-
-Wissen und Werkzeuge zur Bewusstseinserweiterung sollten frei sein.
-
------
-
-Made with 🤍 in Regensburg.
+Public domain under the [Unlicense](LICENSE). Copy it, change it, sell it, build on it. Tools for the mind should be free.
