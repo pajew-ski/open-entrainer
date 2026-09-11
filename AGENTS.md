@@ -7,6 +7,7 @@ Target audience: someone who wants a beat for sleep, meditation, or focus withou
 ## Non-Goals
 
 - No framework, no build tool, no bundler, no package manager
+- No second file. The app is `index.html` alone; stylesheet and script are inline so one file can be copied anywhere and run
 - No external resource of any kind: no CDN, no web font, no analytics
 - No accounts, no network requests, no data leaving the page
 - No manual dark/light toggle. Automatic only, via `prefers-color-scheme`
@@ -20,16 +21,14 @@ Target audience: someone who wants a beat for sleep, meditation, or focus withou
 ├── AGENTS.md
 ├── README.md            (short: what this is, link to the Pages site)
 ├── LICENSE              (Unlicense)
-├── index.html           (the page: explanation, session with map and settings, usage, safety)
-├── style.css            (design tokens shared with temet-nosce and open-desensitizer, plus app rules)
-└── app.js               (plan, audio graph, transport, map drawing, settings persistence)
+└── index.html           (the whole app: page, stylesheet and script in one file)
 ```
 
 GitHub Pages deploys from the root of `main`. The footer derives its GitHub links from the Pages URL, so a fork needs no edit.
 
 ## Design
 
-The stylesheet begins with the token block from temet-nosce, verbatim. It stays verbatim in all three projects; a change to the tokens is a change to all three.
+The inline stylesheet begins with the token block from temet-nosce, verbatim. It stays verbatim in all three projects; a change to the tokens is a change to all three.
 
 - Color: oklch with chroma 0. Light: bg 98%, surface 94%, border 85%, text 15%, muted 40%. Dark flips the scale under `prefers-color-scheme: dark`. `color-scheme: light dark` on the root so form controls follow.
 - Spacing: Fibonacci in pixels, 5 8 13 21 34 55 89 144, as `--space-1` to `--space-8`.
@@ -57,12 +56,10 @@ English throughout. Plain sentences, present tense, no exclamation marks, no emo
 
 ### `index.html`
 
-Hero with the project name and one sentence. Sections: How it works (with the band table), Session (map, transport, three panels), Using it, Before you use it. Footer with the AGENTS.md and source links and the module that rewrites them from the Pages URL.
+One file with three parts: the `<style>` block in the head, the markup, and one `<script type="module">` at the end of the body (plus the small footer module before it).
 
-### `style.css`
+Markup: hero with the project name and one sentence. Sections: How it works (with the band table), Session (map, transport, three panels), Using it, Before you use it. Footer with the AGENTS.md and source links and the module that rewrites them from the Pages URL.
 
-Token block, base rules (hero, sections, tables, controls, buttons, footer), then the map, HUD, panels and fields.
+Style block: token block, base rules (hero, sections, tables, controls, buttons, footer), then the map, HUD, panels and fields.
 
-### `app.js`
-
-An ES module. No globals beyond what the DOM gives. Sections: plan (easeInOutCubic, glide, beatAt, bandOf), settings (load, save, readPlan, render, renderClock, renderBeat, showEndTime, applyEndTime, update), audio (pinkNoiseBuffer, startAudio, stopAudio, applyVolumes, setFrequencies), transport (setState, play, pause, stop, loop), map (colors, resize, draw), and the event wiring at the bottom.
+Script block: an ES module. No globals beyond what the DOM gives. Sections: plan (easeInOutCubic, glide, beatAt, bandOf), settings (load, save, readPlan, render, renderClock, renderBeat, showEndTime, applyEndTime, update), audio (pinkNoiseBuffer, startAudio, stopAudio, applyVolumes, setFrequencies), transport (setState, play, pause, stop, loop), map (colors, resize, draw), and the event wiring at the bottom.

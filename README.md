@@ -1,6 +1,6 @@
 # open entrainer
 
-A binaural beat generator in the browser. Two tones a few hertz apart, one in each ear, ramped along a curve you set, with pink noise underneath to cover the room. One HTML file, one stylesheet, one script, nothing else.
+A binaural beat generator in the browser. Two tones a few hertz apart, one in each ear, ramped along a curve you set, with pink noise underneath to cover the room. One HTML file with everything in it, nothing else.
 
 **Site**: [pajew-ski.github.io/open-entrainer](https://pajew-ski.github.io/open-entrainer/)
 
@@ -41,7 +41,7 @@ cd open-entrainer
 open index.html
 ```
 
-There is no build step and no dependency. Any static host serves it as is; on GitHub Pages, deploy from the root of `main`. The footer links adapt to a fork automatically.
+The whole app is `index.html`; copy that one file anywhere and it runs. There is no build step and no dependency. Any static host serves it as is; on GitHub Pages, deploy from the root of `main`. The footer links adapt to a fork automatically.
 
 Everything here was built by a coding agent from [AGENTS.md](AGENTS.md), which is the design and behavior spec of the tool.
 
