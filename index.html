@@ -608,7 +608,7 @@
 
     const plan = { tIn: 0, tHold: 0, tOut: 0, total: 0, start: 40, target: 4.4, end: 10 };
     const session = { playing: false, paused: false, elapsed: 0, lastFrame: 0, frame: 0 };
-    const audio = { ctx: null, oscL: null, oscR: null, gainL: null, gainR: null, noise: null, noiseGain: null };
+    const audio = { ctx: null, oscL: null, oscR: null, gainL: null, gainR: null, noise: null, noiseGain: null, carrier: null };
     const ctx = ui.map.getContext("2d");
     let mapW = 0;
     let mapH = 0;
@@ -762,6 +762,47 @@
       return buffer;
     }
 
+    function silentWav(seconds) {
+      // One channel, 8 bit, 8 kHz: a header and a run of midpoint samples.
+      const n = 8000 * seconds;
+      const view = new DataView(new ArrayBuffer(44 + n));
+      const text = (at, str) => [...str].forEach((c, i) => view.setUint8(at + i, c.charCodeAt(0)));
+      text(0, "RIFF");
+      view.setUint32(4, 36 + n, true);
+      text(8, "WAVEfmt ");
+      view.setUint32(16, 16, true);
+      view.setUint16(20, 1, true);
+      view.setUint16(22, 1, true);
+      view.setUint32(24, 8000, true);
+      view.setUint32(28, 8000, true);
+      view.setUint16(32, 1, true);
+      view.setUint16(34, 8, true);
+      text(36, "data");
+      view.setUint32(40, n, true);
+      for (let i = 0; i < n; i++) view.setUint8(44 + i, 128);
+      return new Blob([view], { type: "audio/wav" });
+    }
+
+    function claimPlayback() {
+      // iOS puts Web Audio in the ambient session, which the silent switch
+      // mutes on the speaker. Ask for the playback session where Safari has
+      // the API; elsewhere a looping silent media element does the same.
+      if (navigator.audioSession) {
+        navigator.audioSession.type = "playback";
+        return;
+      }
+      if (!audio.carrier) {
+        audio.carrier = new Audio(URL.createObjectURL(silentWav(1)));
+        audio.carrier.loop = true;
+        audio.carrier.setAttribute("playsinline", "");
+      }
+      audio.carrier.play().catch(() => {});
+    }
+
+    function releasePlayback() {
+      if (audio.carrier) audio.carrier.pause();
+    }
+
     function startAudio() {
       const AC = window.AudioContext || window.webkitAudioContext;
       if (!AC) return;
@@ -847,6 +888,7 @@
         session.elapsed = 0;
         showEndTime();
       }
+      claimPlayback();
       if (!audio.ctx) startAudio();
       else if (audio.ctx.state === "suspended") audio.ctx.resume();
       session.playing = true;
@@ -862,6 +904,7 @@
       session.paused = true;
       cancelAnimationFrame(session.frame);
       if (audio.ctx) audio.ctx.suspend();
+      releasePlayback();
       setState("Paused");
     }
 
@@ -871,6 +914,7 @@
       session.elapsed = 0;
       cancelAnimationFrame(session.frame);
       stopAudio();
+      releasePlayback();
       setState(label);
       render();
       draw();
