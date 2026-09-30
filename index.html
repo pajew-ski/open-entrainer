@@ -6,6 +6,16 @@
   <title>open entrainer</title>
   <meta name="description" content="A binaural beat generator in the browser: two tones a few hertz apart, ramped along a curve you set, with pink noise to cover the room.">
   <link rel="icon" href="data:,">
+  <script>
+    // Language: both variants ship in this file. German when the browser's first
+    // language is German, English otherwise; ?lang=de or ?lang=en overrides.
+    // Runs before the first paint so the other variant never flashes.
+    {
+      const asked = new URLSearchParams(location.search).get("lang");
+      const first = (navigator.languages && navigator.languages[0]) || navigator.language || "en";
+      document.documentElement.lang = asked === "de" || asked === "en" ? asked : /^de\b/i.test(first) ? "de" : "en";
+    }
+  </script>
   <style>
     /* Design tokens, shared with temet-nosce.
        Color is strictly achromatic: oklch with chroma 0 cannot tint, light and
@@ -61,6 +71,14 @@
     }
 
     [hidden] {
+      display: none !important;
+    }
+
+    /* Every translated element carries its own lang; the one that does not
+       match the root is hidden. */
+
+    html[lang="de"] [lang="en"],
+    html[lang="en"] [lang="de"] {
       display: none !important;
     }
 
@@ -408,16 +426,20 @@
 <body>
   <header class="hero shell">
     <h1>open entrainer</h1>
-    <p>Two tones, one in each ear, a few hertz apart. The brain hears the difference as a slow beat and tends to follow it.</p>
+    <p lang="en">Two tones, one in each ear, a few hertz apart. The brain hears the difference as a slow beat and tends to follow it.</p>
+    <p lang="de">Zwei Töne, einer in jedem Ohr, wenige Hertz auseinander. Das Gehirn hört den Unterschied als langsame Schwebung und neigt dazu, ihr zu folgen.</p>
   </header>
 
   <main class="shell">
     <section id="how">
-      <h2>How it works</h2>
-      <p>A binaural beat is not in the sound. The left ear gets one frequency, the right ear another, and the brainstem, comparing the two, constructs a pulse at their difference. With 100 Hz on the left and 104 Hz on the right, that pulse is 4 Hz, which is in the theta range. Over minutes, brainwave activity tends to drift toward the beat. This only works with headphones; through speakers the two tones mix in the air and the effect is gone.</p>
-      <p>A session has three phases. The ramp in takes the beat from a waking frequency down to the target. The hold keeps it there. The ramp out brings it back up so you do not surface too fast. The transitions follow a logarithmic curve with soft ends, because the body resists sudden changes of state.</p>
-      <p>Pink noise under the tones covers the room and makes the pure sines easier to sit with. Everything is generated in this page while it plays. Nothing is downloaded, nothing is sent anywhere, and the settings stay in your browser.</p>
-      <table>
+      <h2><span lang="en">How it works</span><span lang="de">Wie es funktioniert</span></h2>
+      <p lang="en">A binaural beat is not in the sound. The left ear gets one frequency, the right ear another, and the brainstem, comparing the two, constructs a pulse at their difference. With 100 Hz on the left and 104 Hz on the right, that pulse is 4 Hz, which is in the theta range. Over minutes, brainwave activity tends to drift toward the beat. This only works with headphones; through speakers the two tones mix in the air and the effect is gone.</p>
+      <p lang="de">Eine binaurale Schwebung steckt nicht im Klang. Das linke Ohr bekommt eine Frequenz, das rechte eine andere, und der Hirnstamm bildet beim Vergleich der beiden einen Puls in Höhe ihrer Differenz. Mit 100 Hz links und 104 Hz rechts sind das 4 Hz, also Theta. Über Minuten neigt die Hirnwellenaktivität dazu, sich diesem Puls anzunähern. Das funktioniert nur mit Kopfhörern; über Lautsprecher mischen sich die beiden Töne in der Luft, und der Effekt ist weg.</p>
+      <p lang="en">A session has three phases. The ramp in takes the beat from a waking frequency down to the target. The hold keeps it there. The ramp out brings it back up so you do not surface too fast. The transitions follow a logarithmic curve with soft ends, because the body resists sudden changes of state.</p>
+      <p lang="de">Eine Sitzung hat drei Phasen. Der Einstieg führt die Schwebung von einer Wachfrequenz hinunter zum Ziel. Das Halten bleibt dort. Der Ausstieg führt sie wieder hinauf, damit man nicht zu schnell auftaucht. Die Übergänge folgen einer logarithmischen Kurve mit weichen Enden, weil der Körper sich gegen plötzliche Zustandswechsel sträubt.</p>
+      <p lang="en">Pink noise under the tones covers the room and makes the pure sines easier to sit with. Everything is generated in this page while it plays. Nothing is downloaded, nothing is sent anywhere, and the settings stay in your browser.</p>
+      <p lang="de">Rosa Rauschen unter den Tönen deckt den Raum ab und macht die reinen Sinustöne leichter erträglich. Alles wird beim Abspielen in dieser Seite erzeugt. Nichts wird heruntergeladen, nichts wird irgendwohin gesendet, und die Einstellungen bleiben im Browser.</p>
+      <table lang="en">
         <thead>
           <tr><th>Band</th><th>Beat</th><th>Typically</th></tr>
         </thead>
@@ -429,20 +451,32 @@
           <tr><td>Gamma</td><td>above 30 Hz</td><td>focused attention</td></tr>
         </tbody>
       </table>
+      <table lang="de">
+        <thead>
+          <tr><th>Band</th><th>Schwebung</th><th>Typisch für</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Delta</td><td>unter 4 Hz</td><td>Tiefschlaf</td></tr>
+          <tr><td>Theta</td><td>4 bis 8 Hz</td><td>Schläfrigkeit, Trance, die Schwelle zum Schlaf</td></tr>
+          <tr><td>Alpha</td><td>8 bis 13 Hz</td><td>entspannte Wachheit, Augen geschlossen</td></tr>
+          <tr><td>Beta</td><td>13 bis 30 Hz</td><td>gewöhnliches waches Denken</td></tr>
+          <tr><td>Gamma</td><td>über 30 Hz</td><td>fokussierte Aufmerksamkeit</td></tr>
+        </tbody>
+      </table>
     </section>
 
     <section id="session">
-      <h2>Session</h2>
+      <h2><span lang="en">Session</span><span lang="de">Sitzung</span></h2>
 
       <div class="viz">
-        <canvas id="map" aria-label="The planned beat frequency over the session, drawn as a band around a center line"></canvas>
+        <canvas id="map"></canvas>
         <div class="hud hud-left">
-          <span class="hud-label">State</span>
-          <span id="state" class="hud-value">Ready</span>
+          <span class="hud-label"><span lang="en">State</span><span lang="de">Zustand</span></span>
+          <span id="state" class="hud-value"></span>
           <span id="clock" class="hud-small">00:00 / 60:00</span>
         </div>
         <div class="hud hud-right">
-          <span class="hud-label">Beat</span>
+          <span class="hud-label"><span lang="en">Beat</span><span lang="de">Schwebung</span></span>
           <span class="hud-value"><span id="band">Gamma</span> <span id="beat">40.0 Hz</span></span>
           <span class="hud-small">L <span id="freq-l">80.0</span> · R <span id="freq-r">120.0</span></span>
         </div>
@@ -451,97 +485,109 @@
       <div class="actions">
         <button type="button" id="btn-play" class="button primary">Start</button>
         <button type="button" id="btn-pause" class="button" disabled>Pause</button>
-        <button type="button" id="btn-stop" class="button" disabled>Stop</button>
+        <button type="button" id="btn-stop" class="button" disabled><span lang="en">Stop</span><span lang="de">Stopp</span></button>
       </div>
-      <p class="caption">Space starts and pauses. Headphones are required.</p>
+      <p class="caption"><span lang="en">Space starts and pauses. Headphones are required.</span><span lang="de">Leertaste startet und pausiert. Kopfhörer sind nötig.</span></p>
 
       <div class="panels">
         <div class="panel">
-          <h3>Timing</h3>
+          <h3><span lang="en">Timing</span><span lang="de">Ablauf</span></h3>
           <div class="fields">
             <label class="field">
-              <span>Ramp in</span>
+              <span><span lang="en">Ramp in</span><span lang="de">Einstieg</span></span>
               <input type="number" id="t-in" value="12" min="1" max="60" step="1">
               <span class="unit">min</span>
             </label>
             <label class="field">
-              <span>Hold</span>
+              <span><span lang="en">Hold</span><span lang="de">Halten</span></span>
               <input type="number" id="t-hold" value="42" min="1" max="600" step="1">
               <span class="unit">min</span>
             </label>
             <label class="field">
-              <span>Ramp out</span>
+              <span><span lang="en">Ramp out</span><span lang="de">Ausstieg</span></span>
               <input type="number" id="t-out" value="6" min="1" max="60" step="1">
               <span class="unit">min</span>
             </label>
             <label class="field">
-              <span>End at</span>
+              <span><span lang="en">End at</span><span lang="de">Ende um</span></span>
               <input type="time" id="t-end">
               <span class="unit" id="total">60 min</span>
             </label>
           </div>
-          <p class="caption">Setting an end time adjusts the hold so the session finishes then.</p>
+          <p class="caption"><span lang="en">Setting an end time adjusts the hold so the session finishes then.</span><span lang="de">Eine Endzeit passt das Halten so an, dass die Sitzung dann endet.</span></p>
         </div>
 
         <div class="panel">
-          <h3>Beat</h3>
+          <h3><span lang="en">Beat</span><span lang="de">Schwebung</span></h3>
           <label class="control">
-            <span class="control-label"><span>Start</span><output id="val-start">40.0 Hz</output></span>
+            <span class="control-label"><span><span lang="en">Start</span><span lang="de">Anfang</span></span><output id="val-start">40.0 Hz</output></span>
             <input type="range" id="d-start" min="0.5" max="40" step="0.5" value="40">
           </label>
           <label class="control">
-            <span class="control-label"><span>Target</span><output id="val-target">4.4 Hz</output></span>
+            <span class="control-label"><span><span lang="en">Target</span><span lang="de">Ziel</span></span><output id="val-target">4.4 Hz</output></span>
             <input type="range" id="d-target" min="0.5" max="40" step="0.1" value="4.4">
           </label>
           <label class="control">
-            <span class="control-label"><span>End</span><output id="val-end">10.0 Hz</output></span>
+            <span class="control-label"><span><span lang="en">End</span><span lang="de">Ende</span></span><output id="val-end">10.0 Hz</output></span>
             <input type="range" id="d-end" min="0.5" max="40" step="0.5" value="10">
           </label>
           <label class="control">
-            <span class="control-label"><span>Carrier</span><output id="val-base">100 Hz</output></span>
+            <span class="control-label"><span><span lang="en">Carrier</span><span lang="de">Trägerton</span></span><output id="val-base">100 Hz</output></span>
             <input type="range" id="base" min="60" max="400" step="1" value="100">
           </label>
         </div>
 
         <div class="panel">
-          <h3>Mix</h3>
+          <h3><span lang="en">Mix</span><span lang="de">Mischung</span></h3>
           <label class="control">
-            <span class="control-label"><span>Tones</span><output id="val-tone">80%</output></span>
+            <span class="control-label"><span><span lang="en">Tones</span><span lang="de">Töne</span></span><output id="val-tone">80%</output></span>
             <input type="range" id="vol-tone" min="0" max="100" step="1" value="80">
           </label>
           <label class="control">
-            <span class="control-label"><span>Pink noise</span><output id="val-noise">3%</output></span>
+            <span class="control-label"><span><span lang="en">Pink noise</span><span lang="de">Rosa Rauschen</span></span><output id="val-noise">3%</output></span>
             <input type="range" id="vol-noise" min="0" max="50" step="1" value="3">
           </label>
-          <p class="caption">Start quiet. The tones do not need to be loud to work.</p>
+          <p class="caption"><span lang="en">Start quiet. The tones do not need to be loud to work.</span><span lang="de">Leise beginnen. Die Töne müssen nicht laut sein, um zu wirken.</span></p>
         </div>
       </div>
     </section>
 
     <section id="using">
-      <h2>Using it</h2>
-      <ul>
+      <h2><span lang="en">Using it</span><span lang="de">Anwendung</span></h2>
+      <ul lang="en">
         <li>Put on stereo headphones and keep the volume low.</li>
         <li>Pick a target. Around 4 to 6 Hz for sleep onset or a long lying meditation, 8 to 10 Hz for resting with eyes closed, 14 to 20 Hz for focused work.</li>
         <li>Set the three durations, or set an end time and let the hold stretch to meet it. For a session that should end when the alarm goes, this is the easier way.</li>
         <li>Start, close your eyes, and let it run. The session stops itself at the end.</li>
       </ul>
+      <ul lang="de">
+        <li>Stereo-Kopfhörer aufsetzen und die Lautstärke niedrig halten.</li>
+        <li>Ein Ziel wählen. Etwa 4 bis 6 Hz zum Einschlafen oder für eine lange Meditation im Liegen, 8 bis 10 Hz zum Ruhen mit geschlossenen Augen, 14 bis 20 Hz für konzentriertes Arbeiten.</li>
+        <li>Die drei Dauern einstellen oder eine Endzeit setzen und das Halten sich danach richten lassen. Für eine Sitzung, die mit dem Wecker enden soll, ist das der einfachere Weg.</li>
+        <li>Starten, die Augen schließen und laufen lassen. Die Sitzung stoppt am Ende von selbst.</li>
+      </ul>
     </section>
 
     <section id="before">
-      <h2>Before you use it</h2>
-      <ul>
+      <h2><span lang="en">Before you use it</span><span lang="de">Vor der Anwendung</span></h2>
+      <ul lang="en">
         <li>This is a self-help tool, not a medical device. It does not treat anything.</li>
         <li>Do not use it while driving or operating anything that needs your attention.</li>
         <li>With epilepsy, a pacemaker, or a psychiatric condition, ask a clinician first.</li>
         <li>Stop if you feel unwell. Use it at your own responsibility.</li>
+      </ul>
+      <ul lang="de">
+        <li>Dies ist ein Werkzeug zur Selbsthilfe, kein Medizinprodukt. Es behandelt nichts.</li>
+        <li>Nicht beim Fahren benutzen oder beim Bedienen von irgendetwas, das Aufmerksamkeit braucht.</li>
+        <li>Bei Epilepsie, Herzschrittmacher oder psychischer Erkrankung vorher ärztlich abklären.</li>
+        <li>Aufhören, wenn es einem nicht gut geht. Die Nutzung erfolgt auf eigene Verantwortung.</li>
       </ul>
     </section>
   </main>
 
   <footer>
     <div class="shell">
-      open entrainer · built from <a id="agents-link" href="https://github.com/pajew-ski/open-entrainer/blob/main/AGENTS.md">AGENTS.md</a> by a coding agent · <a id="source-link" href="https://github.com/pajew-ski/open-entrainer">source on GitHub</a>
+      open entrainer · <span lang="en">built from</span><span lang="de">gebaut aus</span> <a id="agents-link" href="https://github.com/pajew-ski/open-entrainer/blob/main/AGENTS.md">AGENTS.md</a> <span lang="en">by a coding agent</span><span lang="de">von einem Coding-Agenten</span> · <a id="source-link" href="https://github.com/pajew-ski/open-entrainer"><span lang="en">source on GitHub</span><span lang="de">Quelltext auf GitHub</span></a>
     </div>
   </footer>
 
@@ -573,6 +619,23 @@
       [30, "Beta"],
       [Infinity, "Gamma"],
     ];
+
+    // Interface strings. The prose is in the markup, one element per language;
+    // only what the script writes lives here.
+    const LANG = document.documentElement.lang === "de" ? "de" : "en";
+    const T = {
+      en: {
+        map: "The planned beat frequency over the session, drawn as a band around a center line",
+        ready: "Ready", running: "Running", paused: "Paused", finished: "Finished",
+        start: "Start", resume: "Resume",
+      },
+      de: {
+        map: "Die geplante Schwebungsfrequenz über die Sitzung, gezeichnet als Band um eine Mittellinie",
+        ready: "Bereit", running: "Läuft", paused: "Pausiert", finished: "Beendet",
+        start: "Start", resume: "Weiter",
+      },
+    }[LANG];
+    const num = (v, digits) => LANG === "de" ? v.toFixed(digits).replace(".", ",") : v.toFixed(digits);
 
     const $ = (id) => document.getElementById(id);
 
@@ -679,9 +742,9 @@
     }
 
     function render() {
-      ui.valStart.textContent = `${plan.start.toFixed(1)} Hz`;
-      ui.valTarget.textContent = `${plan.target.toFixed(1)} Hz`;
-      ui.valEnd.textContent = `${plan.end.toFixed(1)} Hz`;
+      ui.valStart.textContent = `${num(plan.start, 1)} Hz`;
+      ui.valTarget.textContent = `${num(plan.target, 1)} Hz`;
+      ui.valEnd.textContent = `${num(plan.end, 1)} Hz`;
       ui.valBase.textContent = `${ui.base.value} Hz`;
       ui.valTone.textContent = `${ui.volTone.value}%`;
       ui.valNoise.textContent = `${ui.volNoise.value}%`;
@@ -700,9 +763,9 @@
     function renderBeat(hz) {
       const base = parseInt(ui.base.value, 10);
       ui.band.textContent = bandOf(hz);
-      ui.beat.textContent = `${hz.toFixed(1)} Hz`;
-      ui.freqL.textContent = (base - hz / 2).toFixed(1);
-      ui.freqR.textContent = (base + hz / 2).toFixed(1);
+      ui.beat.textContent = `${num(hz, 1)} Hz`;
+      ui.freqL.textContent = num(base - hz / 2, 1);
+      ui.freqR.textContent = num(base + hz / 2, 1);
     }
 
     function pad(n) {
@@ -879,7 +942,7 @@
       ui.play.disabled = session.playing;
       ui.pause.disabled = !session.playing;
       ui.stop.disabled = !session.playing && !session.paused;
-      ui.play.textContent = session.paused ? "Resume" : "Start";
+      ui.play.textContent = session.paused ? T.resume : T.start;
     }
 
     function play() {
@@ -894,7 +957,7 @@
       session.playing = true;
       session.paused = false;
       session.lastFrame = performance.now();
-      setState("Running");
+      setState(T.running);
       session.frame = requestAnimationFrame(loop);
     }
 
@@ -905,10 +968,10 @@
       cancelAnimationFrame(session.frame);
       if (audio.ctx) audio.ctx.suspend();
       releasePlayback();
-      setState("Paused");
+      setState(T.paused);
     }
 
-    function stop(label = "Ready") {
+    function stop(label = T.ready) {
       session.playing = false;
       session.paused = false;
       session.elapsed = 0;
@@ -925,7 +988,7 @@
       session.elapsed += (now - session.lastFrame) / 1000;
       session.lastFrame = now;
       if (session.elapsed >= plan.total) {
-        stop("Finished");
+        stop(T.finished);
         return;
       }
       const hz = beatAt(session.elapsed);
@@ -1064,9 +1127,10 @@
     window.addEventListener("resize", resize);
     window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", draw);
 
+    ui.map.setAttribute("aria-label", T.map);
     load();
     readPlan();
-    setState("Ready");
+    setState(T.ready);
     resize();
     update(true);
   </script>
