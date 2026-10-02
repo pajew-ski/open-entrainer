@@ -1,0 +1,35 @@
+# After every change to index.html on main, ask the Home Assistant Apps
+# Collection to build a new add-on version right away. The collection checks
+# every hour on its own as well, so this only makes it immediate.
+#
+# Needs the secret APPS_COLLECTION_TOKEN: a fine-grained personal access token
+# with access to pajew-ski/home-assistant-apps-collection and the permission
+# "Contents: Read and write" (which repository_dispatch requires). Without the
+# secret, or in a fork, the job says so and ends green.
+name: Notify add-on collection
+
+on:
+  push:
+    branches: [main]
+    paths: [index.html]
+  workflow_dispatch:
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch upstream-changed to the collection
+        env:
+          TOKEN: ${{ secrets.APPS_COLLECTION_TOKEN }}
+          SLUG: ${{ github.event.repository.name }}
+        run: |
+          if [ "${{ github.repository_owner }}" != "pajew-ski" ] || [ -z "$TOKEN" ]; then
+            echo "::notice::No APPS_COLLECTION_TOKEN here; the collection picks this change up on its hourly check."
+            exit 0
+          fi
+          curl -sf -X POST \
+            -H "Authorization: Bearer $TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/pajew-ski/home-assistant-apps-collection/dispatches \
+            -d "{\"event_type\":\"upstream-changed\",\"client_payload\":{\"slug\":\"$SLUG\",\"sha\":\"$GITHUB_SHA\"}}"
+          echo "Asked the collection to build $SLUG at ${GITHUB_SHA:0:7}."

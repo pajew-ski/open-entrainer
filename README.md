@@ -43,6 +43,8 @@ open index.html
 
 The whole app is `index.html`; copy that one file anywhere and it runs. There is no build step and no dependency. Any static host serves it as is; on GitHub Pages, deploy from the root of `main`. The footer links adapt to a fork automatically.
 
+As a Home Assistant add-on, the page ships through the [Home Assistant Apps Collection](https://github.com/pajew-ski/home-assistant-apps-collection), together with its sibling apps. Every change to `index.html` on `main` becomes a new add-on version automatically.
+
 The page speaks English and German. It shows German when the browser's first language is German and English otherwise; `?lang=de` or `?lang=en` overrides that.
 
 Everything here was built by a coding agent from [AGENTS.md](AGENTS.md), which is the design and behavior spec of the tool. It is a sibling of [open desensitizer](https://github.com/pajew-ski/open-desensitizer) and [open helix](https://github.com/pajew-ski/open-helix).
