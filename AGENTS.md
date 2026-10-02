@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Public GitHub repo, project name **open-entrainer**. Content: a binaural beat generator in the browser. Two oscillators a beat apart, pink noise under them, a three phase plan for the beat, and a canvas that draws the plan. It is a sibling of **open-desensitizer** and shares its design with **temet-nosce**; the three should look and read as one family.
+Public GitHub repo, project name **open-entrainer**. Content: a binaural beat generator in the browser. Two oscillators a beat apart, pink noise under them, a three phase plan for the beat, and a canvas that draws the plan. It is a sibling of **open-desensitizer** and **open-helix** and shares its design with **temet-nosce**; the four should look and read as one family.
 
 Target audience: someone who wants a beat for sleep, meditation, or focus without an app, an account, or a download. The page has to explain the mechanism in one read and expose every parameter without a settings menu.
 
@@ -11,6 +11,7 @@ Target audience: someone who wants a beat for sleep, meditation, or focus withou
 - No external resource of any kind: no CDN, no web font, no analytics
 - No accounts, no network requests, no data leaving the page
 - No manual dark/light toggle. Automatic only, via `prefers-color-scheme`
+- No manual language switch. Automatic only, via the browser's language, with a URL override
 - No color. The design is achromatic; brainwave bands are named, never colored
 - No modal, no collapsible settings panel. Everything is on the page
 
@@ -28,7 +29,7 @@ GitHub Pages deploys from the root of `main`. The footer derives its GitHub link
 
 ## Design
 
-The inline stylesheet begins with the token block from temet-nosce, verbatim. It stays verbatim in all three projects; a change to the tokens is a change to all three.
+The inline stylesheet begins with the token block from temet-nosce, verbatim. It stays verbatim in all projects of the family; a change to the tokens is a change to all of them.
 
 - Color: oklch with chroma 0. Light: bg 98%, surface 94%, border 85%, text 15%, muted 40%. Dark flips the scale under `prefers-color-scheme: dark`. `color-scheme: light dark` on the root so form controls follow.
 - Spacing: Fibonacci in pixels, 5 8 13 21 34 55 89 144, as `--space-1` to `--space-8`.
@@ -48,15 +49,22 @@ The inline stylesheet begins with the token block from temet-nosce, verbatim. It
 - Map: time top to bottom. The beat is drawn as a band of border color between the two tone frequencies, edged in text color, centered on the carrier. Brainwave band boundaries (4, 8, 13, 30 Hz) are faint vertical lines mirrored around the center, labelled in hertz along the bottom edge on the right side. Phase boundaries are dashed horizontal lines. While playing or paused, a horizontal line in text color marks the current position. The canvas reads its colors from its own computed style (background, color, border color, outline color) so it follows the color scheme without a second palette. Device pixel ratio is respected. Redrawn on input, resize, theme change, and every frame while playing.
 - Readouts: State (Ready, Running, Paused, Finished) and elapsed over total. Band name and beat to one decimal, left and right frequency to one decimal.
 
+## Language
+
+The page ships in English and German in the same file. A small classic script in the head sets `<html lang>` before the first paint: German when the browser's first language starts with `de`, English otherwise; `?lang=de` or `?lang=en` overrides. Without script the page stays English.
+
+- Prose in the markup exists once per language, as sibling elements with `lang="en"` and `lang="de"`. One CSS rule hides every element whose `lang` does not match the root. Short labels follow the same pattern with sibling spans.
+- Strings the script writes live in a small table `T` with one entry per language. Numbers use a decimal point in English and a decimal comma in German.
+
 ## Copy
 
-English throughout. Plain sentences, present tense, no exclamation marks, no emoji, no em dashes. Explain the mechanism, name the bands, say what the tool does not do. Warnings are stated once in a section of their own. Product names are lowercase in headings and the footer, as in temet-nosce.
+Plain sentences, present tense, no exclamation marks, no emoji, no em dashes, in both languages. The German avoids direct address where an infinitive does the job. Explain the mechanism, name the bands, say what the tool does not do. Warnings are stated once in a section of their own. Product names are lowercase in headings and the footer, as in temet-nosce. README, AGENTS.md and commit messages are English.
 
 ## Files
 
 ### `index.html`
 
-One file with three parts: the `<style>` block in the head, the markup, and one `<script type="module">` at the end of the body (plus the small footer module before it).
+One file with four parts: the language script and the `<style>` block in the head, the markup, and one `<script type="module">` at the end of the body (plus the small footer module before it).
 
 Markup: hero with the project name and one sentence. Sections: How it works (with the band table), Session (map, transport, three panels), Using it, Before you use it. Footer with the AGENTS.md and source links and the module that rewrites them from the Pages URL.
 

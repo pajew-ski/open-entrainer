@@ -1,6 +1,6 @@
 # open entrainer
 
-A binaural beat generator in the browser. Two tones a few hertz apart, one in each ear, ramped along a curve you set, with pink noise underneath to cover the room. One HTML file with everything in it, nothing else.
+A binaural beat generator in the browser. Two tones a few hertz apart, one in each ear, ramped along a curve you set, with pink noise underneath to cover the room. One HTML file with everything in it, nothing else. In English and German, chosen by the browser's language.
 
 **Site**: [pajew-ski.github.io/open-entrainer](https://pajew-ski.github.io/open-entrainer/)
 
@@ -43,7 +43,9 @@ open index.html
 
 The whole app is `index.html`; copy that one file anywhere and it runs. There is no build step and no dependency. Any static host serves it as is; on GitHub Pages, deploy from the root of `main`. The footer links adapt to a fork automatically.
 
-Everything here was built by a coding agent from [AGENTS.md](AGENTS.md), which is the design and behavior spec of the tool.
+The page speaks English and German. It shows German when the browser's first language is German and English otherwise; `?lang=de` or `?lang=en` overrides that.
+
+Everything here was built by a coding agent from [AGENTS.md](AGENTS.md), which is the design and behavior spec of the tool. It is a sibling of [open desensitizer](https://github.com/pajew-ski/open-desensitizer) and [open helix](https://github.com/pajew-ski/open-helix).
 
 ## License
 
