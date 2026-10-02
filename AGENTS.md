@@ -22,10 +22,12 @@ Target audience: someone who wants a beat for sleep, meditation, or focus withou
 ├── AGENTS.md
 ├── README.md            (short: what this is, link to the Pages site)
 ├── LICENSE              (Unlicense)
-└── index.html           (the whole app: page, stylesheet and script in one file)
+├── index.html           (the whole app: page, stylesheet and script in one file)
+└── .github/workflows/
+    └── notify-addon.yml (after each change to index.html on main, asks the Home Assistant Apps Collection to build a new add-on version)
 ```
 
-GitHub Pages deploys from the root of `main`. The footer derives its GitHub links from the Pages URL, so a fork needs no edit.
+GitHub Pages deploys from the root of `main`. The footer derives its GitHub links from the Pages URL, so a fork needs no edit. The Home Assistant add-on is built from `index.html` by the Home Assistant Apps Collection; this repo carries no add-on files, only the workflow that notifies the collection. It needs the secret `APPS_COLLECTION_TOKEN`; without it the collection still picks the change up within the hour.
 
 ## Design
 
