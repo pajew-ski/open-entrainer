@@ -31,14 +31,41 @@ GitHub Pages deploys from the root of `main`. The footer derives its GitHub link
 
 ## Design
 
-The inline stylesheet begins with the token block from temet-nosce, verbatim. It stays verbatim in all projects of the family; a change to the tokens is a change to all of them.
+### Tokens (albedo)
 
-- Color: oklch with chroma 0. Light: bg 98%, surface 94%, border 85%, text 15%, muted 40%. Dark flips the scale under `prefers-color-scheme: dark`. `color-scheme: light dark` on the root so form controls follow.
-- Spacing: Fibonacci in pixels, 5 8 13 21 34 55 89 144, as `--space-1` to `--space-8`.
-- Type: system-ui. Base 1rem, line-height 1.618, sizes 0.875rem, 1rem, φ, φ², φ³.
-- Layout: a `.shell` of 987px max width with 21px side padding. Hero, sections, footer. Text columns cap at 42rem.
-- Map: a golden rectangle (aspect ratio φ, max height 610px) on the surface color with a border. Readouts sit in its top corners as HUD text: label in small caps, value at φ size, detail in muted small text.
-- Settings: three bordered panels, Timing, Beat, Mix, in an auto-fit grid that wraps to one column below 233px per panel. Native inputs with `accent-color` set to the text color.
+The inline stylesheet begins with the albedo token block, from `/* albedo: Anfang */` to `/* albedo: Ende */`, markers included. The block is identical, byte for byte, in all four repos of the family (temet-nosce, open-desensitizer, open-entrainer, open-helix); a change to it is a change to all four. Its source lives in a private repository, so the tables below are the reference here.
+
+Tones, `oklch(L 0 0)`:
+
+| Token | Light | Dark |
+|---|---|---|
+| `--bg` | 98% | 15% |
+| `--surface` | 94% | 23% |
+| `--border` | 85% | 32% |
+| `--text` | 15% | 95% |
+| `--text-muted` | 40% | 70% |
+
+Geometry:
+
+| Token | Value | Rule |
+|---|---|---|
+| `--step-2` … `--step-7` | 4, 8, 16, 32, 64, 128 px | 2ⁿ px |
+| `--radius-sm`, `--radius-md`, `--radius-lg` | `--step-2`, `--step-3`, `--step-4` (4, 8, 16 px) | |
+| `--type-sm` | 0.875rem | 14px, 1 − 2⁻³, the legibility floor |
+| `--type-0` … `--type-4` | 1, 1.414, 2, 2.828, 4 rem | 2^(k/2) rem |
+| `--leading` | 1.414 | √2 |
+| shell (outside the block) | 1024px max width | 2¹⁰ |
+| text column (outside the block) | 32rem max width | 2⁵ rem |
+
+- Color is achromatic. Chroma 0 cannot tint; light and dark share one scale and flip with `prefers-color-scheme`. `color-scheme: light dark` on the root so form controls follow. There is no switch, neither for the scheme nor for the language.
+- Hue exists only as a data channel: `oklch(var(--hue-l) var(--hue-c) H)`, with `--hue-l` 45% light and 75% dark, `--hue-c` 0.11, and the angle H free. Hue never carries meaning alone; a second mark (shape, position, label) always goes with it.
+- Geometry derives from 2, the same growth as the Krystal Flower. A size the tokens do not cover takes the nearest power of two, a font size the nearest √2 step, never below 0.875rem. Exceptions: the 1px hairline, the 44px tap target, radii of half the element height (circles and pills stay round), and values that belong to a foreign system.
+
+### Components
+
+- Layout: a `.shell` of 1024px max width with 16px side padding. Hero, sections, footer. Text columns cap at 32rem.
+- Map: a 2:1 rectangle (square up to 480px viewport width, max height 512px) on the surface color with a border. Readouts sit in its top corners as HUD text: label in small caps, value at `--type-1`, detail in muted small text.
+- Settings: three bordered panels, Timing, Beat, Mix, in an auto-fit grid that wraps to one column below 256px per panel. Native inputs with `accent-color` set to the text color.
 - Buttons: bordered, transparent. The primary button is inverted (text-colored surface, background-colored label). Nothing is colored, nothing glows.
 
 ## Behavior
