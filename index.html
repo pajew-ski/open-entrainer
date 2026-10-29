@@ -17,54 +17,60 @@
     }
   </script>
   <style>
-    /* Design tokens, shared with temet-nosce.
-       Color is strictly achromatic: oklch with chroma 0 cannot tint, light and
-       dark share one scale and flip with prefers-color-scheme. Geometry derives
-       from φ: the spacing ladder is the Fibonacci sequence, the type scale is
-       powers of φ. */
+/* albedo: Anfang */
+/* Design tokens (albedo). Color is strictly achromatic: oklch with chroma 0
+   cannot tint, light and dark share one scale and flip with
+   prefers-color-scheme. Geometry derives from 2: spacing steps are powers of
+   two, type sizes are 2^(k/2) rem, line height is √2, the same growth as the
+   Krystal Flower. Hue exists only as a data channel:
+   oklch(var(--hue-l) var(--hue-c) H), lightness and chroma fixed per scheme,
+   the angle free. */
+:root {
+  color-scheme: light dark;
+  --bg: oklch(98% 0 0);
+  --surface: oklch(94% 0 0);
+  --border: oklch(85% 0 0);
+  --text: oklch(15% 0 0);
+  --text-muted: oklch(40% 0 0);
+  --hue-l: 45%;
+  --hue-c: 0.11;
 
-    :root {
-      color-scheme: light dark;
-      --bg: oklch(98% 0 0);
-      --surface: oklch(94% 0 0);
-      --border: oklch(85% 0 0);
-      --text: oklch(15% 0 0);
-      --text-muted: oklch(40% 0 0);
+  --step-2: 4px;
+  --step-3: 8px;
+  --step-4: 16px;
+  --step-5: 32px;
+  --step-6: 64px;
+  --step-7: 128px;
+  --radius-sm: var(--step-2);
+  --radius-md: var(--step-3);
+  --radius-lg: var(--step-4);
 
-      --space-1: 5px;
-      --space-2: 8px;
-      --space-3: 13px;
-      --space-4: 21px;
-      --space-5: 34px;
-      --space-6: 55px;
-      --space-7: 89px;
-      --space-8: 144px;
-      --radius-sm: var(--space-1);
-      --radius-md: var(--space-2);
-      --radius-lg: var(--space-3);
+  --type-sm: 0.875rem;     /* 14px, captions; 1 - 2^-3, legibility floor */
+  --type-0: 1rem;          /* browser default, respects user zoom */
+  --type-1: 1.414rem;      /* 2^(1/2) */
+  --type-2: 2rem;          /* 2^1 */
+  --type-3: 2.828rem;      /* 2^(3/2) */
+  --type-4: 4rem;          /* 2^2 */
+  --leading: 1.414;        /* √2 */
 
-      --text-sm: 0.875rem;     /* 14px, captions; deliberately not 1/φ, legibility floor */
-      --text-base: 1rem;       /* browser default, respects user zoom */
-      --text-lg: 1.618rem;     /* φ¹ */
-      --text-xl: 2.618rem;     /* φ² */
-      --text-2xl: 4.236rem;    /* φ³ */
+  font-family: system-ui, sans-serif;
+  font-size: var(--type-0);
+  line-height: var(--leading);
+  background: var(--bg);
+  color: var(--text);
+}
 
-      font-family: system-ui, sans-serif;
-      font-size: var(--text-base);
-      line-height: 1.618;
-      background: var(--bg);
-      color: var(--text);
-    }
-
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: oklch(15% 0 0);
-        --surface: oklch(20% 0 0);
-        --border: oklch(30% 0 0);
-        --text: oklch(95% 0 0);
-        --text-muted: oklch(70% 0 0);
-      }
-    }
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: oklch(15% 0 0);
+    --surface: oklch(23% 0 0);
+    --border: oklch(32% 0 0);
+    --text: oklch(95% 0 0);
+    --text-muted: oklch(70% 0 0);
+    --hue-l: 75%;
+  }
+}
+/* albedo: Ende */
 
     body {
       margin: 0;
@@ -83,14 +89,14 @@
     }
 
     .shell {
-      max-width: 987px;
+      max-width: 1024px;
       margin: 0 auto;
-      padding: 0 var(--space-4);
+      padding: 0 var(--step-4);
     }
 
     a {
       color: inherit;
-      text-underline-offset: 3px;
+      text-underline-offset: 4px;
     }
 
     :focus-visible {
@@ -101,39 +107,39 @@
     /* Hero */
 
     .hero {
-      padding-block: var(--space-8) var(--space-6);
+      padding-block: var(--step-7) var(--step-6);
     }
 
     .hero h1 {
       margin: 0;
-      font-size: clamp(var(--text-xl), 9vw, var(--text-2xl));
+      font-size: clamp(var(--type-3), 9vw, var(--type-4));
       font-weight: 600;
       letter-spacing: -0.02em;
       line-height: 1;
     }
 
     .hero p {
-      margin: var(--space-4) 0 0;
-      max-width: 34rem;
+      margin: var(--step-4) 0 0;
+      max-width: 32rem;
       color: var(--text-muted);
     }
 
     /* Sections */
 
     main section {
-      margin: 0 0 var(--space-7);
+      margin: 0 0 var(--step-6);
     }
 
     main h2 {
-      margin: 0 0 var(--space-4);
-      font-size: var(--text-lg);
+      margin: 0 0 var(--step-4);
+      font-size: var(--type-1);
       font-weight: 600;
       line-height: 1.2;
     }
 
     main h3 {
-      margin: 0 0 var(--space-2);
-      font-size: var(--text-sm);
+      margin: 0 0 var(--step-3);
+      font-size: var(--type-sm);
       font-weight: 400;
       color: var(--text-muted);
       text-transform: uppercase;
@@ -142,33 +148,33 @@
 
     main section > p,
     main section > ul {
-      margin: 0 0 var(--space-3);
-      max-width: 42rem;
+      margin: 0 0 var(--step-4);
+      max-width: 32rem;
     }
 
     main section > ul {
-      padding-left: var(--space-4);
+      padding-left: var(--step-4);
     }
 
     main section > ul li {
-      margin-bottom: var(--space-1);
+      margin-bottom: var(--step-2);
     }
 
     .caption {
       color: var(--text-muted);
-      font-size: var(--text-sm);
+      font-size: var(--type-sm);
     }
 
     table {
       border-collapse: collapse;
-      font-size: var(--text-sm);
-      margin: 0 0 var(--space-3);
+      font-size: var(--type-sm);
+      margin: 0 0 var(--step-4);
     }
 
     th,
     td {
       text-align: left;
-      padding: var(--space-1) var(--space-4) var(--space-1) 0;
+      padding: var(--step-2) var(--step-4) var(--step-2) 0;
       border-bottom: 1px solid var(--border);
       vertical-align: top;
     }
@@ -182,10 +188,10 @@
 
     .controls {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(233px, 1fr));
-      gap: var(--space-4) var(--space-5);
-      max-width: 42rem;
-      margin: 0 0 var(--space-4);
+      grid-template-columns: repeat(auto-fit, minmax(256px, 1fr));
+      gap: var(--step-4) var(--step-5);
+      max-width: 32rem;
+      margin: 0 0 var(--step-4);
     }
 
     .control {
@@ -195,9 +201,9 @@
     .control-label {
       display: flex;
       justify-content: space-between;
-      gap: var(--space-3);
-      font-size: var(--text-sm);
-      margin-bottom: var(--space-1);
+      gap: var(--step-4);
+      font-size: var(--type-sm);
+      margin-bottom: var(--step-2);
     }
 
     .control-label output {
@@ -208,8 +214,8 @@
     .control-check {
       display: flex;
       align-items: center;
-      gap: var(--space-2);
-      font-size: var(--text-sm);
+      gap: var(--step-3);
+      font-size: var(--type-sm);
     }
 
     input[type="range"],
@@ -232,13 +238,13 @@
     input[type="number"],
     input[type="time"] {
       font: inherit;
-      font-size: var(--text-sm);
+      font-size: var(--type-sm);
       font-variant-numeric: tabular-nums;
       color: var(--text);
       background: var(--bg);
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
-      padding: var(--space-1) var(--space-2);
+      padding: var(--step-2) var(--step-3);
       width: 100%;
       box-sizing: border-box;
     }
@@ -254,18 +260,18 @@
     .actions {
       display: flex;
       flex-wrap: wrap;
-      gap: var(--space-2);
-      margin: 0 0 var(--space-3);
+      gap: var(--step-3);
+      margin: 0 0 var(--step-4);
     }
 
     .button {
       font: inherit;
-      font-size: var(--text-sm);
+      font-size: var(--type-sm);
       color: var(--text);
       background: none;
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
-      padding: var(--space-2) var(--space-4);
+      padding: var(--step-3) var(--step-4);
       cursor: pointer;
     }
 
@@ -300,27 +306,27 @@
 
     footer {
       border-top: 1px solid var(--border);
-      padding: var(--space-5) 0 var(--space-6);
+      padding: var(--step-5) 0 var(--step-6);
       color: var(--text-muted);
-      font-size: var(--text-sm);
+      font-size: var(--type-sm);
     }
 
     @media (max-width: 800px) {
       .hero {
-        padding-block-start: var(--space-7);
+        padding-block-start: var(--step-6);
       }
     }
 
-    /* Visualization: a golden rectangle that draws the planned beat over time,
+    /* Visualization: a 2:1 rectangle that draws the planned beat over time,
        with the live readouts in its corners. The canvas carries the page tokens as
        its own colors so the script can read resolved values from it (canvas fillStyle
        wants a concrete color, and the tokens are oklch). */
 
     .viz {
       position: relative;
-      aspect-ratio: 1.618;
-      max-height: 610px;
-      margin: 0 0 var(--space-4);
+      aspect-ratio: 2;
+      max-height: 512px;
+      margin: 0 0 var(--step-4);
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
       background: var(--surface);
@@ -339,7 +345,7 @@
 
     .hud {
       position: absolute;
-      top: var(--space-3);
+      top: var(--step-4);
       display: flex;
       flex-direction: column;
       pointer-events: none;
@@ -347,29 +353,29 @@
     }
 
     .hud-left {
-      left: var(--space-3);
+      left: var(--step-4);
     }
 
     .hud-right {
-      right: var(--space-3);
+      right: var(--step-4);
       text-align: right;
     }
 
     .hud-label {
-      font-size: var(--text-sm);
+      font-size: var(--type-sm);
       color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.08em;
     }
 
     .hud-value {
-      font-size: var(--text-lg);
+      font-size: var(--type-1);
       font-weight: 600;
       line-height: 1.2;
     }
 
     .hud-small {
-      font-size: var(--text-sm);
+      font-size: var(--type-sm);
       color: var(--text-muted);
     }
 
@@ -377,18 +383,18 @@
 
     .panels {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(233px, 1fr));
-      gap: var(--space-4);
-      margin-top: var(--space-4);
+      grid-template-columns: repeat(auto-fit, minmax(256px, 1fr));
+      gap: var(--step-4);
+      margin-top: var(--step-4);
     }
 
     .panel {
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
-      padding: var(--space-4);
+      padding: var(--step-4);
       display: flex;
       flex-direction: column;
-      gap: var(--space-3);
+      gap: var(--step-4);
     }
 
     .panel .caption {
@@ -397,15 +403,15 @@
 
     .fields {
       display: grid;
-      gap: var(--space-2);
+      gap: var(--step-3);
     }
 
     .field {
       display: grid;
       grid-template-columns: 1fr 5.5rem 3.5rem;
       align-items: center;
-      gap: var(--space-2);
-      font-size: var(--text-sm);
+      gap: var(--step-3);
+      font-size: var(--type-sm);
     }
 
     .field .unit {
@@ -418,7 +424,7 @@
         aspect-ratio: 1;
       }
       .hud-value {
-        font-size: var(--text-base);
+        font-size: var(--type-0);
       }
     }
   </style>
