@@ -649,7 +649,7 @@
     // them, a three phase plan for the beat, and a canvas that draws the plan.
 
     const STORAGE_KEY = "open-entrainer";
-    const MAP_RANGE_HZ = 45; // half width of the canvas in hertz of beat
+    const MAP_RANGE_HZ = 30; // the canvas edge sits at a beat of twice this, so 40 Hz fills two thirds
     const BANDS = [
       [4, "Delta"],
       [8, "Theta"],
@@ -1068,7 +1068,7 @@
 
     // Map: time runs top to bottom, the beat is the width of a band around the
     // center line. Band boundaries sit as faint vertical lines with hertz labels
-    // along the bottom, so the trace can be read without color.
+    // in a strip below, so the trace can be read without color.
 
     function colors() {
       const s = getComputedStyle(ui.map);
@@ -1080,6 +1080,15 @@
       };
     }
 
+    // The plot keeps clear of the HUD and of the label strip: it starts one
+    // step below the lower edge of the taller corner readout and ends one label
+    // strip above the bottom, so no line or fill ever runs under text.
+    const GAP = 8; // --step-3
+    const LABEL_STRIP = 32; // --step-5
+    let plotTop = 0;
+    let plotBottom = 0;
+    let labelPx = 14;
+
     function resize() {
       const dpr = window.devicePixelRatio || 1;
       mapW = ui.map.clientWidth;
@@ -1087,7 +1096,46 @@
       ui.map.width = Math.round(mapW * dpr);
       ui.map.height = Math.round(mapH * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const box = ui.map.getBoundingClientRect();
+      const hudBottom = Math.max(...[...document.querySelectorAll(".hud")].map((h) => h.getBoundingClientRect().bottom - box.top));
+      plotTop = Math.ceil(hudBottom) + GAP;
+      plotBottom = Math.max(plotTop + 1, mapH - LABEL_STRIP);
+      labelPx = parseFloat(getComputedStyle(document.documentElement).fontSize) * 0.875; // --type-sm
       draw();
+    }
+
+    function yAt(t) {
+      return plotTop + (t / plan.total) * (plotBottom - plotTop);
+    }
+
+    function tAt(y) {
+      return ((y - plotTop) / (plotBottom - plotTop)) * plan.total;
+    }
+
+    // Band labels sit centered under their lines in the strip. From the
+    // outermost line inward each label takes the right side; when it would come
+    // closer than one step to the label beside it, it moves to the mirrored line
+    // on the left, and when that side has no room either, it is left out.
+    function placeLabels(cx, pxPerHz) {
+      const placed = [];
+      let rightEdge = mapW - GAP; // left edge of the nearest label placed on the right
+      let leftEdge = GAP; // right edge of the nearest label placed on the left
+      const limits = BANDS.map(([limit]) => limit).filter(Number.isFinite).reverse();
+      for (const limit of limits) {
+        const text = limit === 30 ? "30 Hz" : String(limit);
+        const w = ctx.measureText(text).width;
+        const dx = (limit / 2) * pxPerHz;
+        const rx = cx + dx - w / 2;
+        const lx = cx - dx - w / 2;
+        if (rx + w <= rightEdge - (placed.some((p) => p[2] === 1) ? GAP : 0) && rx >= cx) {
+          placed.push([text, rx, 1]);
+          rightEdge = rx;
+        } else if (lx >= leftEdge + (placed.some((p) => p[2] === -1) ? GAP : 0) && lx + w <= cx) {
+          placed.push([text, lx, -1]);
+          leftEdge = lx + w;
+        }
+      }
+      return placed;
     }
 
     function draw() {
@@ -1095,11 +1143,12 @@
       const c = colors();
       const pxPerHz = mapW / (MAP_RANGE_HZ * 2);
       const cx = mapW / 2;
+      const rows = Math.round(plotBottom - plotTop);
 
       ctx.fillStyle = c.bg;
       ctx.fillRect(0, 0, mapW, mapH);
 
-      // Band boundaries, mirrored around the center.
+      // Band boundaries, mirrored around the center, inside the plot only.
       ctx.strokeStyle = c.border;
       ctx.lineWidth = 1;
       for (const [limit] of BANDS) {
@@ -1107,8 +1156,8 @@
         const dx = (limit / 2) * pxPerHz;
         for (const x of [cx - dx, cx + dx]) {
           ctx.beginPath();
-          ctx.moveTo(Math.round(x) + 0.5, 0);
-          ctx.lineTo(Math.round(x) + 0.5, mapH);
+          ctx.moveTo(Math.round(x) + 0.5, plotTop);
+          ctx.lineTo(Math.round(x) + 0.5, plotBottom);
           ctx.stroke();
         }
       }
@@ -1117,7 +1166,7 @@
       ctx.strokeStyle = c.muted;
       ctx.setLineDash([4, 4]);
       for (const t of [plan.tIn, plan.tIn + plan.tHold]) {
-        const y = Math.round((t / plan.total) * mapH) + 0.5;
+        const y = Math.round(yAt(t)) + 0.5;
         ctx.beginPath();
         ctx.moveTo(0, y);
         ctx.lineTo(mapW, y);
@@ -1128,13 +1177,13 @@
       // The beat: a filled band between the two tones, with its edges drawn.
       ctx.fillStyle = c.border;
       ctx.beginPath();
-      for (let y = 0; y <= mapH; y++) {
-        const dx = (beatAt((y / mapH) * plan.total) / 2) * pxPerHz;
-        ctx.lineTo(cx - dx, y);
+      for (let i = 0; i <= rows; i++) {
+        const y = plotTop + i;
+        ctx.lineTo(cx - (beatAt(tAt(y)) / 2) * pxPerHz, y);
       }
-      for (let y = mapH; y >= 0; y--) {
-        const dx = (beatAt((y / mapH) * plan.total) / 2) * pxPerHz;
-        ctx.lineTo(cx + dx, y);
+      for (let i = rows; i >= 0; i--) {
+        const y = plotTop + i;
+        ctx.lineTo(cx + (beatAt(tAt(y)) / 2) * pxPerHz, y);
       }
       ctx.closePath();
       ctx.fill();
@@ -1143,16 +1192,16 @@
       ctx.lineWidth = 1.5;
       for (const side of [-1, 1]) {
         ctx.beginPath();
-        for (let y = 0; y <= mapH; y++) {
-          const dx = (beatAt((y / mapH) * plan.total) / 2) * pxPerHz;
-          ctx.lineTo(cx + side * dx, y);
+        for (let i = 0; i <= rows; i++) {
+          const y = plotTop + i;
+          ctx.lineTo(cx + side * (beatAt(tAt(y)) / 2) * pxPerHz, y);
         }
         ctx.stroke();
       }
 
       // Progress: a line across the map at the current time.
       if (session.playing || session.paused) {
-        const y = Math.round((session.elapsed / plan.total) * mapH) + 0.5;
+        const y = Math.round(yAt(Math.min(session.elapsed, plan.total))) + 0.5;
         ctx.strokeStyle = c.text;
         ctx.lineWidth = 1;
         ctx.beginPath();
@@ -1161,16 +1210,13 @@
         ctx.stroke();
       }
 
-      // Band boundary labels in hertz of beat, right side, drawn last so the
-      // band fill cannot cover them.
-      ctx.font = "11px system-ui, sans-serif";
+      // Band boundary labels in hertz of beat, in the strip below the plot.
+      ctx.font = `${labelPx}px system-ui, sans-serif`;
       ctx.fillStyle = c.muted;
       ctx.textBaseline = "bottom";
       ctx.textAlign = "left";
-      for (const [limit] of BANDS) {
-        if (!Number.isFinite(limit)) continue;
-        const x = cx + (limit / 2) * pxPerHz + 3;
-        ctx.fillText(limit === 30 ? "30 Hz" : String(limit), x, mapH - 5);
+      for (const [text, x] of placeLabels(cx, pxPerHz)) {
+        ctx.fillText(text, x, mapH - GAP);
       }
     }
 
