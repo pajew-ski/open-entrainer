@@ -236,7 +236,8 @@
     }
 
     input[type="number"],
-    input[type="time"] {
+    input[type="time"],
+    select {
       font: inherit;
       font-size: var(--type-sm);
       font-variant-numeric: tabular-nums;
@@ -250,7 +251,8 @@
     }
 
     input[type="number"]:focus-visible,
-    input[type="time"]:focus-visible {
+    input[type="time"]:focus-visible,
+    select:focus-visible {
       outline-offset: 0;
     }
 
@@ -414,6 +416,13 @@
       font-size: var(--type-sm);
     }
 
+    /* Carrier presets: the list takes the full width of the panel so the
+       longest name fits at 360px. */
+
+    .panel select {
+      min-width: 0;
+    }
+
     .field .unit {
       color: var(--text-muted);
       font-variant-numeric: tabular-nums;
@@ -441,6 +450,8 @@
       <h2><span lang="en">How it works</span><span lang="de">Wie es funktioniert</span></h2>
       <p lang="en">A binaural beat is not in the sound. The left ear gets one frequency, the right ear another, and the brainstem, comparing the two, constructs a pulse at their difference. With 100 Hz on the left and 104 Hz on the right, that pulse is 4 Hz, which is in the theta range. Over minutes, brainwave activity tends to drift toward the beat. This only works with headphones; through speakers the two tones mix in the air and the effect is gone.</p>
       <p lang="de">Eine binaurale Schwebung steckt nicht im Klang. Das linke Ohr bekommt eine Frequenz, das rechte eine andere, und der Hirnstamm bildet beim Vergleich der beiden einen Puls in Höhe ihrer Differenz. Mit 100 Hz links und 104 Hz rechts sind das 4 Hz, also Theta. Über Minuten neigt die Hirnwellenaktivität dazu, sich diesem Puls anzunähern. Das funktioniert nur mit Kopfhörern; über Lautsprecher mischen sich die beiden Töne in der Luft, und der Effekt ist weg.</p>
+      <p lang="en">The carrier is the pitch both tones sit around; it does not change the beat. The beat is clearest with carriers of a few hundred hertz and fades above about 1000 Hz, where the ear stops following the phase of a tone, so the carrier ends there. The nine Solfeggio frequencies are listed as presets by number and name only. The page makes no claim about what any of them does.</p>
+      <p lang="de">Der Trägerton ist die Tonhöhe, um die beide Töne liegen; die Schwebung ändert er nicht. Am deutlichsten ist sie bei Trägertönen von einigen hundert Hertz, oberhalb von etwa 1000 Hz verblasst sie, weil das Ohr der Phase eines Tons dort nicht mehr folgt; deshalb endet der Trägerton dort. Die neun Solfeggio-Frequenzen stehen als Vorgaben bereit, nur mit Zahl und Namen. Über ihre Wirkung macht die Seite keine Aussage.</p>
       <p lang="en">A session has three phases. The ramp in takes the beat from a waking frequency down to the target. The hold keeps it there. The ramp out brings it back up so you do not surface too fast. The transitions follow a logarithmic curve with soft ends, because the body resists sudden changes of state.</p>
       <p lang="de">Eine Sitzung hat drei Phasen. Der Einstieg führt die Schwebung von einer Wachfrequenz hinunter zum Ziel. Das Halten bleibt dort. Der Ausstieg führt sie wieder hinauf, damit man nicht zu schnell auftaucht. Die Übergänge folgen einer logarithmischen Kurve mit weichen Enden, weil der Körper sich gegen plötzliche Zustandswechsel sträubt.</p>
       <p lang="en">Pink noise under the tones covers the room and makes the pure sines easier to sit with. Everything is generated in this page while it plays. Nothing is downloaded, nothing is sent anywhere, and the settings stay in your browser.</p>
@@ -539,7 +550,26 @@
           </label>
           <label class="control">
             <span class="control-label"><span><span lang="en">Carrier</span><span lang="de">Trägerton</span></span><output id="val-base">100 Hz</output></span>
-            <input type="range" id="base" min="60" max="400" step="1" value="100">
+            <input type="range" id="base" min="60" max="1000" step="1" value="100">
+          </label>
+          <select id="base-preset" aria-label="Carrier preset">
+            <option value="" id="base-custom">No preset</option>
+            <optgroup label="Solfeggio">
+              <option value="174">174 Hz Solfeggio</option>
+              <option value="285">285 Hz Solfeggio</option>
+              <option value="396">396 Hz Solfeggio Ut</option>
+              <option value="417">417 Hz Solfeggio Re</option>
+              <option value="528">528 Hz Solfeggio Mi</option>
+              <option value="639">639 Hz Solfeggio Fa</option>
+              <option value="741">741 Hz Solfeggio Sol</option>
+              <option value="852">852 Hz Solfeggio La</option>
+              <option value="963">963 Hz Solfeggio</option>
+            </optgroup>
+          </select>
+          <label class="field">
+            <span><span lang="en">Exact value</span><span lang="de">Genauer Wert</span></span>
+            <input type="number" id="base-num" min="60" max="1000" step="1" value="100">
+            <span class="unit">Hz</span>
           </label>
         </div>
 
@@ -563,12 +593,14 @@
       <ul lang="en">
         <li>Put on stereo headphones and keep the volume low.</li>
         <li>Pick a target. Around 4 to 6 Hz for sleep onset or a long lying meditation, 8 to 10 Hz for resting with eyes closed, 14 to 20 Hz for focused work.</li>
+        <li>Leave the carrier at 100 Hz, slide it, type a value from 60 to 1000 Hz, or pick a preset. It changes the pitch, not the beat.</li>
         <li>Set the three durations, or set an end time and let the hold stretch to meet it. For a session that should end when the alarm goes, this is the easier way.</li>
         <li>Start, close your eyes, and let it run. The session stops itself at the end.</li>
       </ul>
       <ul lang="de">
         <li>Stereo-Kopfhörer aufsetzen und die Lautstärke niedrig halten.</li>
         <li>Ein Ziel wählen. Etwa 4 bis 6 Hz zum Einschlafen oder für eine lange Meditation im Liegen, 8 bis 10 Hz zum Ruhen mit geschlossenen Augen, 14 bis 20 Hz für konzentriertes Arbeiten.</li>
+        <li>Den Trägerton bei 100 Hz lassen, verschieben, einen Wert von 60 bis 1000 Hz eintippen oder eine Vorgabe wählen. Er ändert die Tonhöhe, nicht die Schwebung.</li>
         <li>Die drei Dauern einstellen oder eine Endzeit setzen und das Halten sich danach richten lassen. Für eine Sitzung, die mit dem Wecker enden soll, ist das der einfachere Weg.</li>
         <li>Starten, die Augen schließen und laufen lassen. Die Sitzung stoppt am Ende von selbst.</li>
       </ul>
@@ -634,11 +666,13 @@
         map: "The planned beat frequency over the session, drawn as a band around a center line",
         ready: "Ready", running: "Running", paused: "Paused", finished: "Finished",
         start: "Start", resume: "Resume",
+        custom: "No preset", preset: "Carrier preset",
       },
       de: {
         map: "Die geplante Schwebungsfrequenz über die Sitzung, gezeichnet als Band um eine Mittellinie",
         ready: "Bereit", running: "Läuft", paused: "Pausiert", finished: "Beendet",
         start: "Start", resume: "Weiter",
+        custom: "Keine Vorgabe", preset: "Vorgabe für den Trägerton",
       },
     }[LANG];
     const num = (v, digits) => LANG === "de" ? v.toFixed(digits).replace(".", ",") : v.toFixed(digits);
@@ -665,6 +699,9 @@
       dTarget: $("d-target"),
       dEnd: $("d-end"),
       base: $("base"),
+      basePreset: $("base-preset"),
+      baseNum: $("base-num"),
+      baseCustom: $("base-custom"),
       volTone: $("vol-tone"),
       volNoise: $("vol-noise"),
       valStart: $("val-start"),
@@ -752,11 +789,35 @@
       ui.valTarget.textContent = `${num(plan.target, 1)} Hz`;
       ui.valEnd.textContent = `${num(plan.end, 1)} Hz`;
       ui.valBase.textContent = `${ui.base.value} Hz`;
+      syncCarrier();
       ui.valTone.textContent = `${ui.volTone.value}%`;
       ui.valNoise.textContent = `${ui.volNoise.value}%`;
       ui.total.textContent = `${Math.round(plan.total / 60)} min`;
       renderClock();
       if (!session.playing && !session.paused) renderBeat(beatAt(0));
+    }
+
+    // Carrier: the slider holds the value; the number field and the preset list
+    // mirror it. The number field is left alone while it is being typed in.
+    function syncCarrier() {
+      const v = ui.base.value;
+      if (document.activeElement !== ui.baseNum) ui.baseNum.value = v;
+      const preset = [...ui.basePreset.options].some((o) => o.value === v);
+      ui.basePreset.value = preset ? v : "";
+    }
+
+    function typeCarrier(commit) {
+      const v = Math.round(parseFloat(ui.baseNum.value));
+      const min = parseInt(ui.base.min, 10);
+      const max = parseInt(ui.base.max, 10);
+      if (!Number.isFinite(v)) {
+        if (commit) ui.baseNum.value = ui.base.value;
+        return;
+      }
+      if (!commit && (v < min || v > max)) return;
+      ui.base.value = Math.min(max, Math.max(min, v));
+      if (commit) ui.baseNum.value = ui.base.value;
+      update(true);
     }
 
     function renderClock() {
@@ -1119,6 +1180,16 @@
       ui[key].addEventListener("input", () => update(true));
     }
     ui.tEnd.addEventListener("change", applyEndTime);
+    ui.basePreset.addEventListener("change", () => {
+      if (!ui.basePreset.value) {
+        ui.baseNum.focus();
+        return;
+      }
+      ui.base.value = ui.basePreset.value;
+      update(true);
+    });
+    ui.baseNum.addEventListener("input", () => typeCarrier(false));
+    ui.baseNum.addEventListener("change", () => typeCarrier(true));
     ui.play.addEventListener("click", play);
     ui.pause.addEventListener("click", pause);
     ui.stop.addEventListener("click", () => stop());
@@ -1134,6 +1205,8 @@
     window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", draw);
 
     ui.map.setAttribute("aria-label", T.map);
+    ui.baseCustom.textContent = T.custom;
+    ui.basePreset.setAttribute("aria-label", T.preset);
     load();
     readPlan();
     setState(T.ready);
