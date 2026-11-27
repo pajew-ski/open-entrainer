@@ -8,6 +8,8 @@ A binaural beat generator in the browser. Two tones a few hertz apart, one in ea
 
 The left ear gets the carrier minus half the beat, the right ear the carrier plus half the beat. With a 100 Hz carrier and a 4 Hz beat that is 98 Hz and 102 Hz. The brainstem constructs a pulse at the difference, and over minutes brainwave activity tends to drift toward it. This requires headphones; through speakers the two tones mix in the air and there is no beat.
 
+The carrier runs from 60 to 1000 Hz. It sets the pitch, not the beat. Beats are clearest on carriers of a few hundred hertz and fade above about 1000 Hz, where the ear stops following the phase of a tone, so the range ends there. The nine Solfeggio frequencies (174 to 963 Hz) are available as presets, labelled by number and name only, without any claim about what they do. A value of your own can be typed in.
+
 A session has three phases: ramp in from a waking frequency to the target, hold at the target, ramp out to an end frequency. Transitions follow a logarithmic curve with cubic ease at both ends. Instead of typing durations you can set the clock time the session should end at, and the hold stretches to meet it.
 
 The page draws the plan as a band around a center line, time running downward, with the brainwave band boundaries as faint vertical lines. While it plays, a horizontal line marks the current position and the corners show the live beat, band, and both ear frequencies.
@@ -26,8 +28,9 @@ Everything is generated while it plays. Nothing is downloaded, nothing is sent a
 
 1. Put on stereo headphones and keep the volume low.
 2. Pick a target beat. Around 4 to 6 Hz for sleep onset or a long lying meditation, 8 to 10 Hz for resting with eyes closed, 14 to 20 Hz for focused work.
-3. Set the ramp in, hold, and ramp out in minutes, or set an end time and let the hold adjust.
-4. Start, close your eyes, and let it run. Space starts and pauses. The session stops itself at the end.
+3. Leave the carrier at 100 Hz, or slide it, type a value, or pick a preset.
+4. Set the ramp in, hold, and ramp out in minutes, or set an end time and let the hold adjust.
+5. Start, close your eyes, and let it run. Space starts and pauses. The session stops itself at the end.
 
 ## Before you use it
 
